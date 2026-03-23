@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '4.0.2'
+ruby '>= 3.3'
 
 gem 'async'
 gem 'falcon'

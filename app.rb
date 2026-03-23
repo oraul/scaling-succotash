@@ -9,6 +9,10 @@ class App < Sinatra::Base
     set :show_exceptions, false
   end
 
+  configure :test do
+    set :protection, false
+  end
+
   get '/health' do
     json status: 'ok'
   end
