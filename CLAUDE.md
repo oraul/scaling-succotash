@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Stack: Ruby 3.3, Sinatra, Sequel, SQLite, Async gem, Falcon, RSpec
+Stack: Ruby 4.0, Sinatra, Sequel, SQLite, Async gem, Falcon, RSpec
 
 ## Before Every PR
 - `bundle exec rspec`
