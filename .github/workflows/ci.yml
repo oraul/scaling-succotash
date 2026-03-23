@@ -5,18 +5,22 @@ on:
     branches: ["**"]
   pull_request:
     branches: [main]
-  pull_request_target:
-    types: [labeled]
+  issue_comment:
+    types: [created]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     if: >
-      github.event_name != 'pull_request_target' ||
-      github.event.label.name == 'ci'
+      github.event_name != 'issue_comment' || (
+        github.event.issue.pull_request != null &&
+        github.event.comment.body == '/run-ci'
+      )
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request.head.sha || github.sha }}
 
       - uses: ruby/setup-ruby@v1
         with:
