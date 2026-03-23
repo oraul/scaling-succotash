@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - db_data:/app/db
+    environment:
+      DATABASE_URL: sqlite:///app/db/production.sqlite3
+      RACK_ENV: production
+    restart: unless-stopped
+
+volumes:
+  db_data:
