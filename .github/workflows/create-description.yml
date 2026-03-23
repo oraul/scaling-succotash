@@ -35,11 +35,13 @@ jobs:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           if [ -z "$PR_NUMBER" ]; then
-            PR_INFO=$(gh pr view --json number,title,baseRefName)
+            PR_INFO=$(gh pr view "$GITHUB_REF_NAME" --json number,title,baseRefName)
             PR_NUMBER=$(echo "$PR_INFO" | jq -r '.number')
             PR_TITLE=$(echo "$PR_INFO" | jq -r '.title')
             BASE_REF=$(echo "$PR_INFO" | jq -r '.baseRefName')
           fi
+
+          echo "PR #$PR_NUMBER — $PR_TITLE (base: $BASE_REF)"
 
           DIFF=$(git diff "origin/$BASE_REF"...HEAD --stat && echo "---" && git diff "origin/$BASE_REF"...HEAD | head -500)
 
@@ -55,12 +57,17 @@ jobs:
               }]
             }')
 
-          RESPONSE=$(curl -sf \
+          RESPONSE=$(curl -s \
             -H "x-api-key: $ANTHROPIC_API_KEY" \
             -H "anthropic-version: 2023-06-01" \
             -H "content-type: application/json" \
             -d "$PAYLOAD" \
             https://api.anthropic.com/v1/messages)
+
+          if echo "$RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
+            echo "Anthropic API error: $(echo "$RESPONSE" | jq -r '.error.message')"
+            exit 1
+          fi
 
           DESCRIPTION=$(echo "$RESPONSE" | jq -r '.content[0].text')
 
