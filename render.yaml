@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: scaling-succotash
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: RACK_ENV
+        sync: false
+      - key: DATABASE_URL
+        sync: false

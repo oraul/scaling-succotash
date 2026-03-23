@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'fileutils'
 require 'sequel'
+require 'sequel/extensions/migration'
 require 'rspec/core/rake_task'
 
 DB_PATH = ENV.fetch('DATABASE_URL', 'sqlite://db/development.sqlite3')
@@ -23,7 +25,7 @@ namespace :db do
   desc 'Drop and recreate database'
   task :reset do
     db_file = DB_PATH.sub('sqlite://', '')
-    File.delete(db_file) if File.exist?(db_file)
+    FileUtils.rm_f(db_file)
     Rake::Task['db:migrate'].invoke
     puts 'Database reset.'
   end

@@ -2,8 +2,16 @@
 
 require 'rack/test'
 require 'rspec'
+require 'json'
+require 'sequel'
+require 'sequel/extensions/migration'
 
 ENV['DATABASE_URL'] = 'sqlite://db/test.sqlite3'
+ENV['RACK_ENV'] = 'test'
+
+# Connect and migrate BEFORE loading app (which loads models that need tables)
+require_relative '../lib/database'
+Sequel::Migrator.run(DB, 'db/migrate')
 
 require_relative '../app'
 
@@ -20,6 +28,12 @@ RSpec.configure do |config|
 
   config.shared_context_metadata_behavior = :apply_to_host_groups
   config.order = :random
+
+  config.before do
+    DB[:tokens].delete
+    DB[:articles].delete
+    DB[:users].delete
+  end
 
   def app
     App
