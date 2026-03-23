@@ -9,7 +9,7 @@ on:
     types: [created]
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
     if: >
       github.event_name != 'issue_comment' || (
@@ -44,7 +44,7 @@ jobs:
         run: bundle exec rubocop --cache true
 
   deploy:
-    needs: test
+    needs: ci
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
