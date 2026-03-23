@@ -1,4 +1,4 @@
-name: Auto PR Description
+name: Create Description
 
 on:
   pull_request:

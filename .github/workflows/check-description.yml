@@ -1,4 +1,4 @@
-name: PR Gate
+name: Check Description
 
 on:
   pull_request:
