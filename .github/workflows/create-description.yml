@@ -3,19 +3,19 @@ name: Create Description
 on:
   pull_request:
     types: [opened]
-  issue_comment:
-    types: [created]
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   describe:
     runs-on: ubuntu-latest
     if: >
-      (
-        github.event_name == 'pull_request'
-      ) || (
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request != null &&
-        (github.event.comment.body == '/describe' || github.event.comment.body == '/ship')
+      github.event_name == 'pull_request' || (
+        github.event_name == 'push' && (
+          contains(github.event.head_commit.message, '[describe]') ||
+          contains(github.event.head_commit.message, '[ship]')
+        )
       )
     permissions:
       pull-requests: write
