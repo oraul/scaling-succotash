@@ -30,10 +30,17 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ github.token }}
-          PR_TITLE: ${{ github.event.pull_request.title || github.event.issue.title }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
-          BASE_REF: ${{ github.event.pull_request.base.ref || github.event.issue.pull_request.base.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
+          if [ -z "$PR_NUMBER" ]; then
+            PR_INFO=$(gh pr view --json number,title,baseRefName)
+            PR_NUMBER=$(echo "$PR_INFO" | jq -r '.number')
+            PR_TITLE=$(echo "$PR_INFO" | jq -r '.title')
+            BASE_REF=$(echo "$PR_INFO" | jq -r '.baseRefName')
+          fi
+
           DIFF=$(git diff "origin/$BASE_REF"...HEAD --stat && echo "---" && git diff "origin/$BASE_REF"...HEAD | head -500)
 
           PAYLOAD=$(jq -n \
