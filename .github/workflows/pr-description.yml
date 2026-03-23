@@ -5,10 +5,17 @@ on:
     types: [opened]
     branches-ignore:
       - main
+  pull_request_target:
+    types: [labeled]
+    branches-ignore:
+      - main
 
 jobs:
   describe:
     runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'pull_request_target' ||
+      github.event.label.name == 'describe'
     permissions:
       pull-requests: write
       contents: read

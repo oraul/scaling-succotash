@@ -5,10 +5,15 @@ on:
     branches: ["**"]
   pull_request:
     branches: [main]
+  pull_request_target:
+    types: [labeled]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'pull_request_target' ||
+      github.event.label.name == 'ci'
 
     steps:
       - uses: actions/checkout@v4
