@@ -6,6 +6,6 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: RACK_ENV
-        value: production
+        sync: false
       - key: DATABASE_URL
-        value: sqlite:///app/db/production.sqlite3
+        sync: false
