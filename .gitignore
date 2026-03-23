@@ -3,3 +3,4 @@
 *.sqlite3-wal
 .bundle/
 vendor/bundle/
+.env
