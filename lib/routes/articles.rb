@@ -2,17 +2,12 @@
 
 class App < Sinatra::Base
   get '/articles' do
-    page = (params[:page] || 1).to_i
-    per_page = [(params[:per_page] || 20).to_i, 100].min
-    offset = (page - 1) * per_page
-
-    dataset = Article.order(Sequel.desc(:created_at))
-    dataset = dataset.where(user_id: params[:user_id].to_i) if params[:user_id]
-
-    articles = dataset.limit(per_page, offset).all
-    total = dataset.count
-
-    json articles: articles.map(&:to_h), meta: { page: page, per_page: per_page, total: total }
+    result = Services::ListArticles.new(
+      page: params[:page] || 1,
+      per_page: params[:per_page] || 20,
+      user_id: params[:user_id]
+    ).call
+    json articles: result[:articles].map(&:to_h), meta: result[:meta]
   end
 
   get '/articles/:id' do
