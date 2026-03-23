@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'sequel'
+require 'sequel/extensions/migration'
 require 'rspec/core/rake_task'
 
 DB_PATH = ENV.fetch('DATABASE_URL', 'sqlite://db/development.sqlite3')
