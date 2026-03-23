@@ -56,15 +56,37 @@ Authorization: Bearer <token>
 
 ### Endpoints
 
-| Method | Path            | Auth | Description                              |
-|--------|-----------------|------|------------------------------------------|
-| GET    | /health         | No   | Health check                             |
-| POST   | /users          | No   | Register a new user                      |
-| POST   | /sessions       | No   | Log in, returns token                    |
-| POST   | /articles       | Yes  | Create an article                        |
-| GET    | /articles       | No   | List articles (paginated, filterable)    |
+#### System
 
-### List articles
+| Method | Path      | Auth | Description  |
+|--------|-----------|------|--------------|
+| GET    | /health   | No   | Health check |
+
+#### Users
+
+| Method | Path         | Auth | Description                        |
+|--------|--------------|------|------------------------------------|
+| POST   | /users       | No   | Register — `{ name, email, password }` |
+| GET    | /users/:id   | No   | Get a user's public profile        |
+
+#### Auth
+
+| Method | Path         | Auth | Description                              |
+|--------|--------------|------|------------------------------------------|
+| POST   | /sessions    | No   | Log in — `{ email, password }` → `{ token }` |
+| DELETE | /sessions    | Yes  | Log out (invalidate token)               |
+
+#### Articles
+
+| Method | Path            | Auth | Description                                   |
+|--------|-----------------|------|-----------------------------------------------|
+| GET    | /articles       | No   | List articles (paginated, filterable by user) |
+| GET    | /articles/:id   | No   | Get a single article                          |
+| POST   | /articles       | Yes  | Create an article                             |
+| PATCH  | /articles/:id   | Yes  | Update own article                            |
+| DELETE | /articles/:id   | Yes  | Delete own article                            |
+
+### List articles query params
 
 ```
 GET /articles?page=1&per_page=20&user_id=42
