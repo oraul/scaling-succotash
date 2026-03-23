@@ -3,9 +3,17 @@ plugins:
 
 AllCops:
   NewCops: enable
+  SuggestExtensions: false
   TargetRubyVersion: 3.3
   Exclude:
+    - 'bin/**/*'
     - 'db/migrate/*.rb'
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 12
 
 Style/Documentation:
   Enabled: false

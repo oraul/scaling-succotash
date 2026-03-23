@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 ruby '>= 3.3'
 
 gem 'async'
+gem 'bcrypt', '~> 3.1'
 gem 'falcon'
 gem 'sequel'
 gem 'sinatra'

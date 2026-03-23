@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: scaling-succotash
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: RACK_ENV
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:///app/db/production.sqlite3
