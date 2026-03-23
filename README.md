@@ -1,6 +1,18 @@
 # scaling-succotash
 
-A blog API built with Ruby, Sinatra, Sequel, and SQLite.
+> **Harness Engineering challenge** — every line of code in this repository is written exclusively by Claude. No human-authored code.
+
+A blog API built with Ruby, Sinatra, Sequel, and SQLite — used as a real-world proving ground for AI-driven development at scale.
+
+## What is Harness Engineering?
+
+Harness Engineering is a practice where AI agents (Claude) are the primary code authors. The repo is the agent's memory: CLAUDE.md sets the always-on rules, Skills package reusable workflows, and Commands give humans explicit control. The result is a codebase that grows through agent sessions without losing context or consistency.
+
+This project follows those principles:
+- `CLAUDE.md` — permanent rulebook injected at every session start
+- `.claude/skills/` — on-demand workflow packages (migrations, PRs)
+- `.claude/hooks/` — automation that runs at session boundaries
+- `docs/` — living architecture docs kept up to date by the agent
 
 ## Features
 
