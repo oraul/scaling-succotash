@@ -3,6 +3,7 @@
 require 'json'
 require 'sinatra/base'
 require 'sinatra/json'
+require_relative 'lib/logger'
 require_relative 'lib/database'
 require_relative 'lib/models/user'
 require_relative 'lib/models/token'
@@ -17,6 +18,7 @@ require_relative 'lib/services/delete_article'
 class App < Sinatra::Base
   configure do
     set :show_exceptions, false
+    set :logging, nil
   end
 
   configure :test do
@@ -38,6 +40,21 @@ class App < Sinatra::Base
     attr_reader :current_user
   end
 
+  before do
+    @_request_started_at = Time.now
+  end
+
+  after do
+    duration_ms = ((Time.now - @_request_started_at) * 1000).round
+    AppLogger.info('request', {
+                     method: request.request_method,
+                     path: request.path_info,
+                     status: response.status,
+                     duration_ms: duration_ms,
+                     user_id: current_user&.id
+                   })
+  end
+
   get '/health' do
     json status: 'ok'
   end
@@ -47,7 +64,9 @@ class App < Sinatra::Base
   end
 
   error do
-    json error: env['sinatra.error'].message
+    e = env['sinatra.error']
+    AppLogger.error('unhandled_error', { class: e.class.name, message: e.message })
+    json error: e.message
   end
 end
 
