@@ -31,15 +31,8 @@ jobs:
           RACK_ENV: test
         run: bundle exec rspec
 
-      - name: Cache RuboCop
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/rubocop_cache
-          key: rubocop-${{ runner.os }}-${{ hashFiles('.rubocop.yml', 'Gemfile.lock') }}
-          restore-keys: rubocop-${{ runner.os }}-
-
       - name: Run RuboCop
-        run: bundle exec rubocop --cache true
+        run: bundle exec rubocop
 
   deploy:
     needs: run-ci
