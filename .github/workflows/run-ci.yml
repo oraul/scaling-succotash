@@ -2,21 +2,12 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
     branches: [main]
 jobs:
   run-ci:
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'pull_request' || (
-        github.event_name == 'push' && (
-          github.ref == 'refs/heads/main' ||
-          contains(github.event.head_commit.message, '[run-ci]') ||
-          contains(github.event.head_commit.message, '[ship]')
-        )
-      )
-
     steps:
       - uses: actions/checkout@v4
 
@@ -31,25 +22,6 @@ jobs:
           RACK_ENV: test
         run: bundle exec rspec
 
-      - name: Cache RuboCop
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/rubocop_cache
-          key: rubocop-${{ runner.os }}-${{ hashFiles('.rubocop.yml', 'Gemfile.lock') }}
-          restore-keys: rubocop-${{ runner.os }}-
-
       - name: Run RuboCop
-        run: bundle exec rubocop --cache true
+        run: bundle exec rubocop
 
-  deploy:
-    needs: run-ci
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Deploy to Render
-        run: |
-          curl -fsSL \
-            -X POST \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys"
