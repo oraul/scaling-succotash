@@ -25,15 +25,3 @@ jobs:
       - name: Run RuboCop
         run: bundle exec rubocop
 
-  deploy:
-    needs: run-ci
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Deploy to Render
-        run: |
-          curl -fsSL \
-            -X POST \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys"
