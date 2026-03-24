@@ -1,9 +1,9 @@
 ---
-name: open-pr
+name: manage-pr
 description: |
-  Opens a pull request following project conventions. Use before pushing
+  Creates or updates a pull request following project conventions. Use before pushing
   a branch for review or merging. Triggers on: "open PR", "create pull request",
-  "ready for review", "submit PR", "open pull request".
+  "ready for review", "submit PR", "open pull request", "update PR", "manage PR".
 ---
 
 ## Steps
@@ -12,8 +12,14 @@ description: |
 2. Confirm linting is clean: `bundle exec rubocop --autocorrect`
 3. Stage and commit any outstanding changes
 4. Push the current branch: `git push -u origin <branch>`
-5. Open the PR with a title and body following the template below
+5. Use `mcp__github__list_pull_requests` to check if a PR already exists for this branch
+   - If it exists: use `mcp__github__update_pull_request` with the PR number to update title and body
+   - If it doesn't exist: use `mcp__github__create_pull_request` to open a new one
 6. Link any related issues in the PR body
+
+## Important
+- Never use `gh` CLI or direct GitHub API calls — always use the `mcp__github__*` tools
+- Always check for an existing PR before creating to avoid 422 errors
 
 ## PR Title Format
 ```
