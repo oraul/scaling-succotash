@@ -1,9 +1,9 @@
 ---
-name: open-pr
+name: manage-pr
 description: |
-  Opens a pull request following project conventions. Use before pushing
+  Creates or updates a pull request following project conventions. Use before pushing
   a branch for review or merging. Triggers on: "open PR", "create pull request",
-  "ready for review", "submit PR", "open pull request".
+  "ready for review", "submit PR", "open pull request", "update PR", "manage PR".
 ---
 
 ## Steps

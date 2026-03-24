@@ -21,4 +21,4 @@ Stack: Ruby >= 3.3, Sinatra, Sequel, SQLite, Async gem, Falcon, RSpec
 
 ## Mandatory Skills
 - Before creating a migration → call /create-migration
-- Before opening a PR        → call /open-pr
+- Before opening a PR        → call /manage-pr
