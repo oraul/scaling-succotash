@@ -11,6 +11,7 @@ jobs:
     if: >
       github.event_name == 'pull_request' || (
         github.event_name == 'push' && (
+          github.ref == 'refs/heads/main' ||
           contains(github.event.head_commit.message, '[run-ci]') ||
           contains(github.event.head_commit.message, '[ship]')
         )
