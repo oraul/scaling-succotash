@@ -5,10 +5,16 @@ on:
     branches: ["**"]
   pull_request:
     branches: [main]
-
 jobs:
-  test:
+  run-ci:
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request' || (
+        github.event_name == 'push' && (
+          contains(github.event.head_commit.message, '[run-ci]') ||
+          contains(github.event.head_commit.message, '[ship]')
+        )
+      )
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +41,7 @@ jobs:
         run: bundle exec rubocop --cache true
 
   deploy:
-    needs: test
+    needs: run-ci
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 

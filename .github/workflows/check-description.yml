@@ -1,0 +1,29 @@
+name: Check Description
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+    branches: [main]
+
+jobs:
+  check-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR description
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          missing=()
+
+          echo "$PR_BODY" | grep -q "## What"    || missing+=("## What")
+          echo "$PR_BODY" | grep -q "## Why"     || missing+=("## Why")
+          echo "$PR_BODY" | grep -q "## How"     || missing+=("## How")
+          echo "$PR_BODY" | grep -q "## Testing" || missing+=("## Testing")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "PR description is missing required sections: ${missing[*]}"
+            echo "Post '/describe' as a comment to auto-generate it."
+            exit 1
+          fi
+
+          echo "PR description looks good."
