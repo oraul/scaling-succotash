@@ -41,7 +41,7 @@ jobs:
         run: bundle exec rubocop --cache true
 
   deploy:
-    needs: ci
+    needs: run-ci
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
