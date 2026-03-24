@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require_relative '../concerns/loggable'
+
 module Services
   class AuthenticateUser
+    include Concerns::Loggable
+
     def initialize(email:, password:)
       @email = email
       @password = password
@@ -11,7 +15,9 @@ module Services
       user = User.first(email: @email)
       raise ArgumentError, 'invalid credentials' unless user&.authenticate?(@password)
 
-      Token.generate_for(user)
+      token = Token.generate_for(user)
+      log_info('user.authenticated', { user_id: user.id })
+      token
     end
   end
 end
