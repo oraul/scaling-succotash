@@ -1,5 +1,12 @@
 # Compile
 
+## Table of Contents
+1. [Purpose](#purpose)
+2. [Contract Sections](#contract-sections-required)
+3. [Always](#always)
+4. [Never](#never)
+5. [Tools](#tools)
+
 ## Purpose
 
 Read the raw Fetch output and produce the contract document — the single source of
