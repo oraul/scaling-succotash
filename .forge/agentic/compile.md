@@ -2,34 +2,25 @@
 
 ## Table of Contents
 1. [Purpose](#purpose)
-2. [Contract Sections](#contract-sections-required)
-3. [Always](#always)
-4. [Never](#never)
-5. [Tools](#tools)
+2. [Always](#always)
+3. [Never](#never)
+4. [Tools](#tools)
 
 ## Purpose
 
 Read the raw Fetch output and produce the contract document — the single source of
 truth for Draft and Implement. Output to `.forge/contracts/FRG-NNN-short-description.md`.
 
-## Contract Sections (required)
-
-1. **Business Rules** — requirements translated from ticket language into precise engineering statements
-2. **Acceptance Criteria** — concrete, testable conditions that map directly to spec assertions
-3. **Domain Map** — models, tables, relationships (existing and new), columns, indexes
-4. **Technical Concerns** — race conditions, N+1s, caching, transactions, migrations, external deps
-5. **Constraints** — performance, data volume, backward compatibility
-6. **File Targets** — files to create or modify, grouped as new / modified
-
 ## Always
 
-- Include all 6 sections, in order
+- Follow `.forge/contracts/template.md` — all 7 sections, in order
 - Use precise engineering language — no product/business jargon
 - Make acceptance criteria concrete: specific inputs, expected outputs, edge cases
 - Reference only real tables and columns from the schema Fetch provided
 - List every file that will need to change in File Targets
 - Include indexes and transaction boundaries in Domain Map when relevant
 - Flag at least one technical concern — if none apply, state why explicitly
+- Always populate section 7 (Insights) — document assumptions, confidence gaps, and flags for human review
 
 ## Never
 
