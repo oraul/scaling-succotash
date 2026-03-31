@@ -16,7 +16,7 @@ Source of truth: `docs/architecture/forge.md`
 
 Each file: TOC + Purpose + Always + Never + Tools. Max 100 lines.
 
-- [ ] Write `.forge/agentic/compile.md`
+- [x] Write `.forge/agentic/compile.md`
 - [ ] Write `.forge/agentic/draft.md` (include BetterSpecs always/never rules)
 - [ ] Write `.forge/agentic/implement.md` (include Ruby/Sinatra always/never rules)
 
