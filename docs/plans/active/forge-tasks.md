@@ -9,6 +9,7 @@ Source of truth: `docs/architecture/forge.md`
 - [x] Create `.forge/agentic/` directory
 - [x] Create `.forge/contracts/` directory (contract storage)
 - [x] Define ticket naming convention — `FRG-NNN-short-description.md` in `docs/plans/active/`, moved to `docs/plans/shipped/` when PR merges
+- [ ] Write `.forge/contracts/template.md` — defines the 6 contract sections (Business Rules, Acceptance Criteria, Domain Map, Technical Concerns, Constraints, File Targets)
 
 ---
 
@@ -27,8 +28,8 @@ Each file: TOC + Purpose + Always + Never + Tools. Max 100 lines.
 Shell scripts. No LLM. Same input → same output.
 
 - [ ] Write `Fetch` script — reads files, schema (`db/schema.rb`), git history, rule files
-- [ ] Integrate Jira MCP tool into Fetch (deterministic call, no LLM)
-- [ ] Audit which other MCP tools are available for Fetch
+- [ ] Fetch reads ticket from `docs/plans/active/` (no Jira for now)
+- [ ] Audit which MCP tools are available for Fetch (future Jira integration)
 - [ ] Write `Assess` script — scores contract against 6 checks, outputs PASS/FAIL
 - [ ] Define Assess pass/fail thresholds (Phase 1: low bar, Phase 2: tighten)
 - [ ] Implement task familiarity pattern matching for Assess
