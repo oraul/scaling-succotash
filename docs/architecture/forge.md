@@ -363,7 +363,7 @@ Each agentic step has a spec file under `.forge/agentic/`. All files are under 1
 | `.forge/agentic/compile.md` content | Not started | Write always/never rules. |
 | `.forge/agentic/draft.md` content | Not started | Write always/never rules including BetterSpecs standards. |
 | `.forge/agentic/implement.md` content | Not started | Write always/never rules for Ruby/Sinatra conventions. |
-| Contract storage location | Not started | Likely `.forge/contracts/` alongside feature code. |
+| Contract storage location | Done | Tickets as `FRG-NNN-short-description.md` in `docs/plans/active/`. Moved to `docs/plans/shipped/` when PR merges. Compiled contract stored in `.forge/contracts/`. |
 | MCP tools available in Fetch | Not started | Jira MCP plugin + what else is available. |
 | Blueprint specialization | Deferred | One pipeline for now. May add legacy, debug blueprints later. |
 | Draft as optional | Deferred | For very simple tasks, Implement might handle specs. Decide based on experience. |

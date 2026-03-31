@@ -6,9 +6,9 @@ Source of truth: `docs/architecture/forge.md`
 
 ## 1. Structure
 
-- [ ] Create `.forge/agentic/` directory
-- [ ] Create `.forge/contracts/` directory (contract storage)
-- [ ] Define contract file naming convention (e.g. `TICKET-123.md`)
+- [x] Create `.forge/agentic/` directory
+- [x] Create `.forge/contracts/` directory (contract storage)
+- [x] Define ticket naming convention — `FRG-NNN-short-description.md` in `docs/plans/active/`, moved to `docs/plans/shipped/` when PR merges
 
 ---
 
