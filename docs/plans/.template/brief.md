@@ -31,13 +31,13 @@ Anything uncertain or ambiguous goes here.
 
 Assessed by Claude. Brief must reach **4/5** before Compile runs.
 
-| Check | Status | Notes |
-|---|---|---|
-| Source referenced | ❌ | |
-| Business rules are precise (no vague statements) | ❌ | |
-| Acceptance criteria are concrete and testable | ❌ | |
-| Edge cases and failure scenarios addressed | ❌ | |
-| Uncertainties documented in Notes | ❌ | |
+| Check | Principle | Status | Notes |
+|---|---|---|---|
+| Source referenced | Traceability | ❌ | |
+| Business rules are precise — no vague statements | Precision | ❌ | |
+| Acceptance criteria are concrete and testable | Testability | ❌ | |
+| Edge cases and failure scenarios addressed | Completeness | ❌ | |
+| Uncertainties explicitly documented in Notes | Honesty | ❌ | |
 
 **Score: 0/5**
 
