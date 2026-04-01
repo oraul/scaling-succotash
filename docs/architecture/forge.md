@@ -68,19 +68,19 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 [A] Compile → contract document
       │
       ▼
+[A] Plan → tasks document
+      │
+      ▼
 [D] Assess
       │
       ├── PASS (high confidence) → continue
-      └── FAIL (low confidence) → 🚪 Human reviews contract
+      └── FAIL (low confidence) → 🚪 Human reviews contract + tasks
                                         │
                                         ├── Approve → continue
                                         ├── Reject → ❌
-                                        └── Edit → Compile revises → Assess again
+                                        └── Edit → Compile/Plan revise → Assess again
             │
             ▼
-[A] Plan
-      │
-      ▼
 [A] Draft ◄─────────────────────────────┐
       │                                  │
       ▼                                  │
@@ -121,8 +121,8 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 ```
 [D] Fetch
   → [A] Compile
-  → [D] Assess ✅
   → [A] Plan
+  → [D] Assess ✅
   → [A] Draft
   → [A] Implement
   → [D] Validate ✅
@@ -349,8 +349,8 @@ Each agentic step has a spec file under `.forge/agentic/`. All files are under 1
 | **Fetch** | [D] Collects raw inputs: Jira (MCP), files, schema, git, rule files. Runs once. |
 | **Compile** | [A] Reads raw inputs → produces the contract document. |
 | **Contract** | Markdown document with 6 sections. Single source of truth for Draft + Implement. |
-| **Assess** | [D] Scores the contract against quality checks. Auto-advances or routes to human. |
 | **Plan** | [A] Reads contract → produces tasks.md checklist for Draft and Implement. |
+| **Assess** | [D] Scores contract + tasks against quality checks. PASS auto-advances. FAIL routes to human review of both. |
 | **Draft** | [A] Writes RSpec tests from the contract. Follows BetterSpecs standards. |
 | **Implement** | [A] Implements code to pass specs. Self-reviews. |
 | **Validate** | [D] Runs affected specs + linters. Fast, cheap. |

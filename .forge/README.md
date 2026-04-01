@@ -13,12 +13,12 @@ produce reviewed, tested, merged code from a well-defined ticket.
 [A] Compile ──→ contract.md
      │
      ▼
-[D] Assess
-     ├── PASS ──→ continue
-     └── FAIL ──→ 🚪 human reviews contract
+[A] Plan ──→ tasks.md
      │
      ▼
-[A] Plan ──→ tasks.md
+[D] Assess
+     ├── PASS ──→ continue
+     └── FAIL ──→ 🚪 human reviews contract + tasks
      │
      ▼
 [A] Draft ──→ spec files
@@ -43,8 +43,8 @@ produce reviewed, tested, merged code from a well-defined ticket.
 |---|---|---|
 | **Fetch** | Deterministic | Collects all context — ticket, source files, schema, git history, rule files. Shell script + MCP tools. Runs once. |
 | **Compile** | Agentic | Reads Fetch output → produces `contract.md`. Single source of truth for the full pipeline. |
-| **Assess** | Deterministic | Scores the contract against 6 checks. PASS auto-advances. FAIL routes to human review. |
 | **Plan** | Agentic | Reads contract → produces `tasks.md`. Structured checklist for Draft and Implement. |
+| **Assess** | Deterministic | Scores contract + tasks against quality checks. PASS auto-advances. FAIL routes to human review of both. |
 | **Draft** | Agentic | Writes RSpec specs from the contract. Defines done before any code is written. |
 | **Implement** | Agentic | Implements code to make all specs pass. Self-reviews before submitting. |
 | **Validate** | Deterministic | Runs affected specs + Rubocop on changed files. Fast, cheap. Max 2 retries before bail. |
