@@ -40,11 +40,11 @@ Each file: TOC + Purpose + Always + Never + Tools. Max 100 lines.
 Shell scripts. No LLM. Same input → same output.
 
 - [x] Write `.forge/deterministic/fetch/run.sh`
-- [ ] Write `.forge/deterministic/assess/run.sh` — scores contract + tasks, outputs PASS/FAIL
-- [ ] Define Assess pass/fail thresholds (Phase 1: low bar, Phase 2: tighten)
+- [x] Write `.forge/deterministic/assess/run.sh` — scores contract + tasks, outputs PASS/FAIL
+- [x] Define Assess pass/fail thresholds (Phase 1: low bar, Phase 2: tighten)
 - [ ] Implement task familiarity pattern matching for Assess
-- [ ] Write `.forge/deterministic/validate/run.sh` — RSpec on affected files + Rubocop on changed files
-- [ ] Write `.forge/deterministic/verify/run.sh` — full RSpec suite + full Rubocop
+- [x] Write `.forge/deterministic/validate/run.sh` — RSpec on affected files + Rubocop on changed files
+- [x] Write `.forge/deterministic/verify/run.sh` — full RSpec suite + full Rubocop
 
 ---
 
