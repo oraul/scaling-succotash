@@ -1,7 +1,7 @@
 pipeline:
   - step: fetch
     type: deterministic
-    script: .forge/scripts/fetch.rb
+    script: .forge/steps/fetch/
     on_fail: abort
 
   - step: compile
@@ -16,7 +16,7 @@ pipeline:
 
   - step: assess
     type: deterministic
-    script: .forge/scripts/assess.rb
+    script: .forge/steps/assess/
     on_fail: gate
     gate:
       label: Review contract and tasks
@@ -36,18 +36,19 @@ pipeline:
 
   - step: validate
     type: deterministic
-    script: .forge/scripts/validate.rb
+    script: .forge/steps/validate/
     retry: 2
     on_fail: draft
     on_bail: gate
     gate:
       label: Validate failed after 2 attempts — guidance needed
+      guidance: contract amendments
       on_approve: draft
       on_reject: abort
 
   - step: verify
     type: deterministic
-    script: .forge/scripts/verify.rb
+    script: .forge/steps/verify/
     on_fail: draft
 
 gates:

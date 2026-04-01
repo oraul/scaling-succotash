@@ -62,12 +62,18 @@ produce reviewed, tested, merged code from a well-defined ticket.
 ```
 .forge/
   README.md          ← you are here
+  blueprint.yml      ← pipeline definition (step sequence, routing, gates)
   agentic/
     README.md        ← how to write agentic specs
     compile.md
     plan.md
     draft.md
     implement.md
+  steps/
+    fetch/           ← deterministic: file reader + ticket reader
+    assess/          ← deterministic: contract + tasks scorer
+    validate/        ← deterministic: RSpec (affected) + Rubocop (changed)
+    verify/          ← deterministic: full RSpec + Rubocop
 ```
 
 ## Ticket Lifecycle
