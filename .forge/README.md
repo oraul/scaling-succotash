@@ -69,20 +69,21 @@ produce reviewed, tested, merged code from a well-defined ticket.
     plan.md
     draft.md
     implement.md
-  steps/
-    fetch/           ← deterministic: file reader + ticket reader
-    assess/          ← deterministic: contract + tasks scorer
-    validate/        ← deterministic: RSpec (affected) + Rubocop (changed)
-    verify/          ← deterministic: full RSpec + Rubocop
+  deterministic/
+    fetch/           ← file reader + ticket reader
+    assess/          ← contract + tasks scorer
+    validate/        ← RSpec (affected) + Rubocop (changed)
+    verify/          ← full RSpec + Rubocop
 ```
 
 ## Ticket Lifecycle
 
 ```
 docs/plans/active/FRG-XXXX/    ← in progress
-  brief.md                     ← human + Claude (readiness score)
-  contract.md                  ← Compile output (assess score)
-  tasks.md                     ← Plan output (checklist)
+  brief.md                     ← immutable after readiness 4/5
+  contract.md                  ← immutable after Assess PASS
+  tasks.md                     ← only checkboxes can change
+  log.md                       ← human feedback, guidance, bail notes
 
 docs/plans/shipped/FRG-XXXX/   ← PR merged
 docs/plans/archived/FRG-XXXX/  ← cancelled or abandoned

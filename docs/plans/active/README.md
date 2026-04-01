@@ -14,9 +14,10 @@ Example: `FRG-0001-payment-retry/`
 
 | File | Author | Description |
 |---|---|---|
-| `brief.md` | Human | Goal, source, and notes for the ticket |
-| `contract.md` | Compile | Generated from brief. Source of truth for Draft + Implement |
-| `tasks.md` | TBD | Checklist derived from contract. Checked off by Draft and Implement |
+| `brief.md` | Human | Goal, source, and notes. **Immutable after readiness 4/5** |
+| `contract.md` | Compile | Source of truth for Draft + Implement. **Immutable after Assess PASS** |
+| `tasks.md` | Plan | Checklist. **Only checkboxes can change** |
+| `log.md` | Pipeline | Human feedback, guidance, and bail notes throughout the run |
 
 ## Lifecycle
 
