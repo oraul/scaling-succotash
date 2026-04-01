@@ -21,7 +21,7 @@ Stripe's Minions produce 1,300+ PRs/week with zero human-written code. Key patte
 
 **1. Deterministic + Agentic node separation.** Blueprints alternate between deterministic steps (no AI — linters, git, CI, file reading) and agentic steps (LLM reasoning — understanding tasks, generating code, interpreting failures). Deterministic nodes constrain what the LLM can do. "The model does not run the system. The system runs the model."
 
-**2. Context pre-hydration.** Before the LLM starts, deterministic code assembles everything the agent needs: ticket content, source files, schema, git history, scoped rules. The agent never explores or searches. It starts with full context.
+**2. Context pre-hydration.** In Minions, a deterministic step assembles all context before the LLM starts (isolated cloud instances can't read the repo freely). In Phase 1, Claude CLI has full repo access — Compile reads brief, schema, lib/, spec/ directly. Pre-hydration becomes relevant in Phase 2 when agents run in isolated AWS environments.
 
 **3. Devbox execution.** Agents run in isolated, disposable environments — same environments human engineers use.
 
@@ -45,7 +45,7 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 
 | Original Agent | Verdict | Reasoning |
 |---|---|---|
-| **Scout** | Killed | Deterministic Fetch replaces it. No AI needed for file discovery. |
+| **Scout** | Killed | No AI needed for file discovery. Compile reads the repo directly. |
 | **Diagnose** | Killed | Compile agent handles diagnosis. If specs define expected behavior, failures are self-diagnosing. |
 | **Architect** | Merged into Implement | One agent designs AND implements. Splitting causes handoff loss. |
 | **TDD** | Became Draft | Writes specs before Implement. Separated because spec quality is critical. |
@@ -53,7 +53,7 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 | **Refactor** | Killed | Implement should write clean code the first time. |
 | **Inspect** | Killed | Deterministic Validate + human PR review replaces AI inspection. |
 
-**Result: 3 agentic steps (Compile + Draft + Implement) + deterministic bookends.**
+**Result: 4 agentic steps (Compile + Plan + Draft + Implement) + deterministic checkpoints (Assess, Validate, Verify).**
 
 ---
 
@@ -62,20 +62,20 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 ### Complete Flowchart
 
 ```
-[D] Fetch (once)
+[A] Compile → contract document
       │
       ▼
-[A] Compile → contract document
+[A] Plan → tasks document
       │
       ▼
 [D] Assess
       │
       ├── PASS (high confidence) → continue
-      └── FAIL (low confidence) → 🚪 Human reviews contract
+      └── FAIL (low confidence) → 🚪 Human reviews contract + tasks
                                         │
                                         ├── Approve → continue
                                         ├── Reject → ❌
-                                        └── Edit → Compile revises → Assess again
+                                        └── Edit → Compile/Plan revise → Assess again
             │
             ▼
 [A] Draft ◄─────────────────────────────┐
@@ -116,8 +116,8 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 ### Happy Path
 
 ```
-[D] Fetch
-  → [A] Compile
+[A] Compile
+  → [A] Plan
   → [D] Assess ✅
   → [A] Draft
   → [A] Implement
@@ -131,38 +131,7 @@ Stripe's most unique aspect is the *absence* of a supervisory human mid-pipeline
 
 ## 4. Pipeline Steps — Detailed
 
-### Step 1: [D] Fetch
-
-**Type:** Deterministic
-**Runs:** Once, at pipeline start
-**Purpose:** Collect all raw inputs that Compile, Draft, and Implement will need.
-
-**Transport:**
-
-| Source | Transport |
-|---|---|
-| Files, schema, git history, rule files | Shell script |
-| Jira ticket, internal docs | MCP tools (called deterministically — no LLM) |
-
-This is context pre-hydration. Relevant MCP tools are called before any LLM starts.
-
-**What it collects:**
-
-| Input | Source |
-|---|---|
-| Jira ticket | Jira MCP tool |
-| Source files in target area | Codebase |
-| Existing specs in target area | `spec/` directory |
-| Database schema | `db/schema.rb` |
-| Git history for affected files | `git log` on target files |
-| Directory-scoped coding rules | `.cursor/rules` or similar |
-| Agentic step specs | `.forge/agentic/` |
-
-**Output:** Raw context payload passed to Compile. Everything the pipeline needs, assembled before any AI runs.
-
----
-
-### Step 2: [A] Compile
+### Step 1: [A] Compile
 
 **Type:** Agentic
 **Spec:** `.forge/agentic/compile.md`
@@ -342,10 +311,10 @@ Each agentic step has a spec file under `.forge/agentic/`. All files are under 1
 | **Blueprint** | Pipeline template defining agentic/deterministic node sequence |
 | **Deterministic** | Pipeline step with no AI. Shell script or MCP tool called programmatically. Same input → same output. |
 | **Agentic** | Pipeline step where Claude reasons and generates. Guided by a spec file. |
-| **Fetch** | [D] Collects raw inputs: Jira (MCP), files, schema, git, rule files. Runs once. |
-| **Compile** | [A] Reads raw inputs → produces the contract document. |
+| **Compile** | [A] Reads brief, schema, lib/, spec/ directly → produces the contract document. |
 | **Contract** | Markdown document with 6 sections. Single source of truth for Draft + Implement. |
-| **Assess** | [D] Scores the contract against quality checks. Auto-advances or routes to human. |
+| **Plan** | [A] Reads contract → produces tasks.md checklist for Draft and Implement. |
+| **Assess** | [D] Scores contract + tasks against quality checks. PASS auto-advances. FAIL routes to human review of both. |
 | **Draft** | [A] Writes RSpec tests from the contract. Follows BetterSpecs standards. |
 | **Implement** | [A] Implements code to pass specs. Self-reviews. |
 | **Validate** | [D] Runs affected specs + linters. Fast, cheap. |
@@ -363,8 +332,9 @@ Each agentic step has a spec file under `.forge/agentic/`. All files are under 1
 | `.forge/agentic/compile.md` content | Not started | Write always/never rules. |
 | `.forge/agentic/draft.md` content | Not started | Write always/never rules including BetterSpecs standards. |
 | `.forge/agentic/implement.md` content | Not started | Write always/never rules for Ruby/Sinatra conventions. |
-| Contract storage location | Not started | Likely `.forge/contracts/` alongside feature code. |
+| Contract storage location | Done | Each ticket is a folder `FRG-XXXX-short-description/` with `brief.md` (human) and `contract.md` (Compile). Lives in `docs/plans/active/`, moves to `shipped/` on merge or `archived/` on cancellation. |
 | MCP tools available in Fetch | Not started | Jira MCP plugin + what else is available. |
 | Blueprint specialization | Deferred | One pipeline for now. May add legacy, debug blueprints later. |
 | Draft as optional | Deferred | For very simple tasks, Implement might handle specs. Decide based on experience. |
+| tasks.md generation | Done | Generated by Plan — new agentic step between Assess and Draft. |
 | Warm spot instances vs Lambda | Deferred | Phase 2 (Slack). Spot instances recommended for long-running Claude calls. |

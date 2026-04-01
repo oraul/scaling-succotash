@@ -1,0 +1,190 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Forge — Blueprint Orchestrator
+#
+# Usage:
+#   .forge/run <ticket_path>
+#
+# Example:
+#   .forge/run docs/plans/active/FRG-0001-payment-retry
+#
+# Gates pause the pipeline and prompt the human directly in the terminal.
+# Human reviews files in their editor, types a decision, pipeline continues.
+
+require 'yaml'
+
+BLUEPRINT_PATH = '.forge/blueprint.yml'
+STATE_FILE     = '.forge_state.yml'
+
+class Orchestrator
+  def initialize(ticket_path)
+    @ticket_path = ticket_path
+    @blueprint   = YAML.load_file(BLUEPRINT_PATH)
+    @state_path  = "#{ticket_path}/#{STATE_FILE}"
+    @state       = load_state
+  end
+
+  def run
+    run_from('compile')
+  end
+
+  private
+
+  # ── Step runner ────────────────────────────────────────────────────────────
+
+  def run_from(start_step)
+    index = step_index(start_step)
+
+    while index < pipeline.length
+      step   = pipeline[index]
+      result = execute_step(step)
+
+      case result
+      when :next  then index += 1
+      when :abort then abort "==> Pipeline aborted at #{step['step']}."
+      when String then index = step_index(result)  # jump to named step
+      end
+    end
+
+    puts ''
+    puts '==> Pipeline complete ✅'
+  end
+
+  def execute_step(step)
+    name = step['step']
+    type = step['type']
+
+    puts ''
+    puts "==> [#{type[0].upcase}] #{name}"
+
+    exit_code = type == 'deterministic' ? run_deterministic(step) : run_agentic(step)
+
+    exit_code.zero? ? handle_pass(step) : handle_failure(step)
+  end
+
+  # ── Step execution ─────────────────────────────────────────────────────────
+
+  def run_deterministic(step)
+    script    = "#{step['script']}run.sh"
+    threshold = step['threshold'] ? step['threshold'].to_s : ''
+    system("bash #{script} #{@ticket_path} #{threshold}".strip)
+    $CHILD_STATUS.exitstatus
+  end
+
+  def run_agentic(step)
+    spec        = step['spec']
+    ticket_note = "Ticket path: #{@ticket_path}"
+
+    # Phase 1 — Claude CLI invocation
+    # Passes the agentic spec as the prompt. Claude reads all required files
+    # directly from the repo (brief, schema, lib/, spec/).
+    system("claude --print -p \"$(cat #{spec})\n\n#{ticket_note}\"")
+    $CHILD_STATUS.exitstatus
+  end
+
+  # ── Pass routing ───────────────────────────────────────────────────────────
+
+  def handle_pass(step)
+    # Check if a gate fires after this step on pass (e.g. pr_review after validate)
+    gate_config = (@blueprint['gates'] || {}).values.find do |g|
+      g['after'] == step['step'] && g['condition'] == 'on_pass'
+    end
+
+    gate_config ? prompt_gate(gate_config) : :next
+  end
+
+  # ── Failure routing ────────────────────────────────────────────────────────
+
+  def handle_failure(step)
+    name    = step['step']
+    on_fail = step['on_fail']
+
+    case on_fail
+    when 'abort'
+      puts "  [fail] #{name} failed — aborting"
+      :abort
+    when 'gate'
+      prompt_gate(step['gate'])
+    when String
+      retries = (@state['retry_counts'][name] ||= 0)
+      max     = step.fetch('retry', 0)
+
+      if retries < max
+        @state['retry_counts'][name] += 1
+        save_state
+        puts "  [retry #{retries + 1}/#{max}] routing back to #{on_fail}"
+        on_fail
+      else
+        puts "  [bail] #{name} failed after #{max} retries"
+        prompt_gate(step['gate'])
+      end
+    end
+  end
+
+  # ── Human gate — interactive terminal prompt ───────────────────────────────
+
+  def prompt_gate(gate)
+    label    = gate['label']
+    guidance = gate['guidance']
+    options  = gate_options(gate)
+
+    puts ''
+    puts "  🚪 #{label}"
+    puts "     Review: #{@ticket_path}/" if guidance.nil?
+    puts "     Guidance file: #{@ticket_path}/#{guidance}" if guidance
+    puts ''
+    puts "  Options: #{options.keys.join(' / ')}"
+    print '  Decision: '
+
+    decision = $stdin.gets&.strip&.downcase
+
+    unless options.key?(decision)
+      puts "  Unknown input — expected: #{options.keys.join(', ')}"
+      return prompt_gate(gate)
+    end
+
+    route = options[decision]
+    puts "  -> #{decision}: routing to #{route}"
+
+    route == 'abort' ? :abort : route
+  end
+
+  def gate_options(gate)
+    {}.tap do |opts|
+      opts['approve']     = gate['on_approve']     if gate['on_approve']
+      opts['reject']      = 'abort'                if gate['on_reject'] == 'abort'
+      opts['suggestions'] = gate['on_suggestions'] if gate['on_suggestions']
+      opts['edit']        = gate['on_edit']        if gate['on_edit']
+    end
+  end
+
+  # ── State ──────────────────────────────────────────────────────────────────
+
+  def load_state
+    File.exist?(@state_path) ? YAML.load_file(@state_path) : { 'retry_counts' => {} }
+  end
+
+  def save_state
+    File.write(@state_path, @state.to_yaml)
+  end
+
+  # ── Helpers ────────────────────────────────────────────────────────────────
+
+  def pipeline
+    @blueprint['pipeline']
+  end
+
+  def step_index(name)
+    idx = pipeline.index { |s| s['step'] == name }
+    abort "Unknown step: #{name}" unless idx
+
+    idx
+  end
+end
+
+# ── Entry point ──────────────────────────────────────────────────────────────
+
+ticket_path = ARGV[0] or abort 'Usage: .forge/run <ticket_path>'
+
+Orchestrator.new(ticket_path).run

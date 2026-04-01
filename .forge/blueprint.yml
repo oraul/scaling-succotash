@@ -1,0 +1,57 @@
+pipeline:
+  - step: compile
+    type: agentic
+    spec: .forge/agentic/compile.md
+    on_fail: abort
+
+  - step: plan
+    type: agentic
+    spec: .forge/agentic/plan.md
+    on_fail: abort
+
+  - step: assess
+    type: deterministic
+    script: .forge/deterministic/assess/
+    threshold: 5
+    on_fail: gate
+    gate:
+      label: Review contract and tasks
+      on_approve: continue
+      on_reject: abort
+      on_edit: compile
+
+  - step: draft
+    type: agentic
+    spec: .forge/agentic/draft.md
+    on_fail: abort
+
+  - step: implement
+    type: agentic
+    spec: .forge/agentic/implement.md
+    on_fail: abort
+
+  - step: validate
+    type: deterministic
+    script: .forge/deterministic/validate/
+    retry: 2
+    on_fail: draft
+    on_bail: gate
+    gate:
+      label: Validate failed after 2 attempts — guidance needed
+      guidance: log.md
+      on_approve: draft
+      on_reject: abort
+
+  - step: verify
+    type: deterministic
+    script: .forge/deterministic/verify/
+    on_fail: draft
+
+gates:
+  pr_review:
+    after: validate
+    condition: on_pass
+    label: PR review
+    on_approve: verify
+    on_reject: abort
+    on_suggestions: draft
