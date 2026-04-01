@@ -39,7 +39,6 @@ Each file: TOC + Purpose + Always + Never + Tools. Max 100 lines.
 
 Shell scripts. No LLM. Same input → same output.
 
-- [x] Write `.forge/deterministic/fetch/run.sh`
 - [x] Write `.forge/deterministic/assess/run.sh` — scores contract + tasks, outputs PASS/FAIL
 - [x] Define Assess pass/fail thresholds (Phase 1: low bar, Phase 2: tighten)
 - [ ] Implement task familiarity pattern matching for Assess
