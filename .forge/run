@@ -84,6 +84,7 @@ class Orchestrator
     exit_code = type == 'deterministic' ? run_deterministic(step) : run_agentic(step)
 
     if exit_code.zero?
+      create_pr if step['on_pass'] == 'create_pr'
       post_step_gate(step) || :next
     else
       handle_failure(step, exit_code)
@@ -120,6 +121,7 @@ class Orchestrator
       puts "  [fail] #{name} failed — on_fail: abort"
       :abort
     when 'gate'
+      pr_comment("❌ Assess failed — contract/tasks need review. See PR for details.")
       open_gate(step['gate'])
     when String
       # Retry with counter — bail to gate after max attempts
@@ -134,6 +136,7 @@ class Orchestrator
         on_fail  # return step name → run_from jumps there
       else
         puts "  [bail] #{name} failed after #{max} retries"
+        pr_comment("🛑 Validate bailed after #{max} retries — add guidance to `#{@ticket_path}/log.md` then resume")
         open_gate(step['gate'])
       end
     end
@@ -148,13 +151,16 @@ class Orchestrator
     end
     return nil unless gate_config
 
-    create_pr if step['step'] == 'validate'
+    pr_comment('✅ Validate passed — ready for code review')
     open_gate(gate_config)
   end
 
   def open_gate(gate)
+    pr_url = @state['pr_url']
+
     puts ''
     puts "  🚪 GATE: #{gate['label']}"
+    puts "     PR: #{pr_url}" if pr_url
     puts "     guidance: #{@ticket_path}/#{gate['guidance']}" if gate['guidance']
     puts ''
     puts '  Resume with:'
@@ -166,16 +172,28 @@ class Orchestrator
     :gate
   end
 
-  # ── PR creation ────────────────────────────────────────────────────────────
+  # ── PR creation + comments ─────────────────────────────────────────────────
 
   def create_pr
+    return if @state['pr_url']  # already created
+
     branch      = `git branch --show-current`.strip
     ticket_name = File.basename(@ticket_path)
     contract    = "#{@ticket_path}/contract.md"
     body        = File.exist?(contract) ? File.read(contract) : ticket_name
 
-    puts "  -> creating PR: #{branch}"
-    system("gh pr create --title \"#{ticket_name}\" --body \"#{body.gsub('"', '\\"')}\" --draft")
+    puts "  -> opening draft PR: #{branch}"
+    pr_url = `gh pr create --title "#{ticket_name}" --body "#{body.gsub('"', '\\"')}" --draft`.strip
+
+    save_state(pr_url: pr_url)
+    puts "  -> PR: #{pr_url}"
+  end
+
+  def pr_comment(message)
+    pr_url = @state['pr_url']
+    return unless pr_url
+
+    system("gh pr comment #{pr_url} --body \"#{message}\"")
   end
 
   # ── State ──────────────────────────────────────────────────────────────────
