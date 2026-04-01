@@ -9,7 +9,8 @@
 6. [Constraints](#6-constraints)
 7. [File Targets](#7-file-targets)
 8. [Insights](#8-insights)
-9. [Amendments](#9-amendments)
+9. [Assess Score](#9-assess-score)
+10. [Amendments](#10-amendments)
 
 ---
 
@@ -17,14 +18,13 @@
 
 - **Ticket:** `docs/plans/active/FRG-XXXX/brief.md`
 - **Ref:** github.com/oraul/scaling-succotash/issues/NNN
-- **Original comment:** (paste or summarize what triggered this work)
+- **Brief score at compile time:** X/5
 
 ---
 
 ## 2. Business Rules
 
-What the feature must do. Translated from brief language into precise engineering
-statements. No product jargon.
+Refined from brief. Same language, more precise.
 
 - Rule 1
 - Rule 2
@@ -33,7 +33,7 @@ statements. No product jargon.
 
 ## 3. Acceptance Criteria
 
-Concrete, testable conditions. Each maps directly to a spec assertion.
+Refined from brief. Each maps directly to a spec assertion.
 
 - When X, then Y
 - When X is missing, then Z
@@ -58,13 +58,9 @@ Models, tables, relationships, columns, and indexes involved.
 
 ## 5. Technical Concerns
 
-Issues agents MUST address. If none apply, state why.
+Issues Draft and Implement MUST address. If none apply, state why.
 
-- **Race conditions** — ...
-- **N+1 queries** — ...
-- **Transaction boundaries** — ...
-- **Migrations** — ...
-- **External dependencies** — ...
+- **Concern** — impact and what must be done
 
 ---
 
@@ -90,19 +86,37 @@ Non-functional requirements.
 
 ## 8. Insights
 
-Key assumptions, confidence gaps, and flags for human review.
-Feeds into Assess scoring.
+Compile's assumptions, confidence gaps, and flags. Feeds into Assess.
 
 - **Assumptions** — what Compile assumed when context was ambiguous
-- **Confidence** — areas where the contract may be incomplete or uncertain
-- **Flags** — anything a human should pay close attention to before approving
+- **Confidence** — areas that may be incomplete or uncertain
+- **Flags** — anything requiring human attention before approving
 
 ---
 
-## 9. Amendments
+## 9. Assess Score
 
-Revisions made after human review at Gate 1. Each entry dated.
+Filled by the Assess step. Contract must reach **5/6** to auto-advance.
 
-| Date | Change |
-|---|---|
-| YYYY-MM-DD | Human clarified: ... |
+| Check | Principle | Status | Notes |
+|---|---|---|---|
+| All sections present and non-empty | Completeness | ❌ | |
+| Business rules are precise | Precision | ❌ | |
+| Acceptance criteria are testable | Testability | ❌ | |
+| Domain map references real schema tables | Traceability | ❌ | |
+| Technical concerns addressed or justified | Honesty | ❌ | |
+| File targets consistent with codebase | Precision | ❌ | |
+
+**Score: 0/6**
+
+> Decision: (PASS — auto-advance / FAIL — human review required)
+
+---
+
+## 10. Amendments
+
+Revisions after human review at Gate 1.
+
+| Date | Who | Change |
+|---|---|---|
+| YYYY-MM-DD | Human / Compile | Clarified: ... |
