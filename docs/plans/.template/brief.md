@@ -24,3 +24,21 @@ What done looks like. Concrete and testable.
 
 Constraints, risks, or context Compile should know about.
 Anything uncertain or ambiguous goes here.
+
+---
+
+## Readiness Score
+
+Assessed by Claude. Brief must reach **4/5** before Compile runs.
+
+| Check | Status | Notes |
+|---|---|---|
+| Source referenced | ❌ | |
+| Business rules are precise (no vague statements) | ❌ | |
+| Acceptance criteria are concrete and testable | ❌ | |
+| Edge cases and failure scenarios addressed | ❌ | |
+| Uncertainties documented in Notes | ❌ | |
+
+**Score: 0/5**
+
+> What's missing: (Claude fills this in during collaboration)
