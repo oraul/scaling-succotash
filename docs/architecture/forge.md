@@ -367,4 +367,5 @@ Each agentic step has a spec file under `.forge/agentic/`. All files are under 1
 | MCP tools available in Fetch | Not started | Jira MCP plugin + what else is available. |
 | Blueprint specialization | Deferred | One pipeline for now. May add legacy, debug blueprints later. |
 | Draft as optional | Deferred | For very simple tasks, Implement might handle specs. Decide based on experience. |
+| tasks.md generation | Not started | Who generates tasks.md from contract — Compile (two outputs) or a new pipeline step between Assess and Draft. |
 | Warm spot instances vs Lambda | Deferred | Phase 2 (Slack). Spot instances recommended for long-running Claude calls. |

@@ -16,6 +16,7 @@ Example: `FRG-0001-payment-retry/`
 |---|---|---|
 | `brief.md` | Human | Goal, source, and notes for the ticket |
 | `contract.md` | Compile | Generated from brief. Source of truth for Draft + Implement |
+| `tasks.md` | TBD | Checklist derived from contract. Checked off by Draft and Implement |
 
 ## Lifecycle
 
