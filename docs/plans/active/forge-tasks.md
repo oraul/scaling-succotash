@@ -41,7 +41,7 @@ Shell scripts. No LLM. Same input → same output.
 
 - [x] Write `.forge/deterministic/assess/run.sh` — scores contract + tasks, outputs PASS/FAIL
 - [x] Define Assess pass/fail thresholds (Phase 1: low bar, Phase 2: tighten)
-- [ ] Implement task familiarity pattern matching for Assess
+- [x] Implement task familiarity pattern matching for Assess
 - [x] Write `.forge/deterministic/validate/run.sh` — RSpec on affected files + Rubocop on changed files
 - [x] Write `.forge/deterministic/verify/run.sh` — full RSpec suite + full Rubocop
 

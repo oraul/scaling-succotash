@@ -108,6 +108,43 @@ else
   pass "File targets contain .rb paths (Precision)"
 fi
 
+# ── Task familiarity: compare file target patterns against shipped tickets ───
+# Informational only — does not affect score.
+# Extracts path prefixes from File Targets and checks if shipped contracts
+# have seen the same patterns before.
+SHIPPED_DIR="docs/plans/shipped"
+familiar_count=0
+novel_patterns=()
+
+# Extract path prefixes from File Targets section (lib/services/, lib/models/, db/migrate/, etc.)
+mapfile -t target_patterns < <(
+  sed -n '/## 7. File Targets/,/## 8./p' "$CONTRACT" \
+    | grep -oE '(lib|spec|db)/[a-z_/]+' \
+    | sed 's|/[^/]*$|/|' \
+    | sort -u
+)
+
+if [ "${#target_patterns[@]}" -eq 0 ]; then
+  familiarity_note="[familiarity] No path patterns found in File Targets — skipping"
+elif [ ! -d "$SHIPPED_DIR" ] || [ -z "$(ls -A "$SHIPPED_DIR" 2>/dev/null)" ]; then
+  familiarity_note="[familiarity] No shipped tickets yet — task type is novel by default"
+else
+  for pattern in "${target_patterns[@]}"; do
+    if grep -rlE "$pattern" "$SHIPPED_DIR"/*/contract.md 2>/dev/null | grep -q .; then
+      familiar_count=$((familiar_count + 1))
+    else
+      novel_patterns+=("$pattern")
+    fi
+  done
+
+  if [ "${#novel_patterns[@]}" -eq 0 ]; then
+    familiarity_note="[familiarity] All path patterns familiar — seen in $familiar_count shipped ticket(s)"
+  else
+    novel_list=$(IFS=", "; echo "${novel_patterns[*]}")
+    familiarity_note="[familiarity] Novel patterns: $novel_list — no prior shipped examples"
+  fi
+fi
+
 # ── Tasks check: spec + implementation files listed ─────────────────────────
 tasks_ok=true
 if ! grep -qE "spec/.*_spec\.rb" "$TASKS"; then
@@ -131,6 +168,8 @@ if ! $tasks_ok; then
   echo "  [warn] tasks.md is incomplete — human should review before advancing"
 fi
 
+echo ""
+echo "  $familiarity_note"
 echo ""
 
 if [ "$score" -ge "$PASS_THRESHOLD" ]; then
