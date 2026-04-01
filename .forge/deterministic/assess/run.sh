@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # frozen_string_literal: true
 # Assess — scores contract.md + tasks.md, outputs PASS/FAIL
-# Usage: ./run.sh <ticket_path>
-# Example: ./run.sh docs/plans/active/FRG-0001-payment-retry
+# Usage: ./run.sh <ticket_path> [threshold]
+# Example: ./run.sh docs/plans/active/FRG-0001-payment-retry 5
 #
-# PASS threshold: 5/6 (Phase 1 — tighten in Phase 2)
+# Threshold passed from blueprint.yml — raise it as Compile quality is proven.
 # FAIL → human gate (assess-edit or assess-reject)
 
 set -euo pipefail
@@ -13,8 +13,9 @@ TICKET_PATH="${1:?Usage: run.sh <ticket_path>}"
 CONTRACT="$TICKET_PATH/contract.md"
 TASKS="$TICKET_PATH/tasks.md"
 SCHEMA="db/schema.rb"
+AUTONOMY_LOG=".forge/autonomy/assess_log.csv"
 
-PASS_THRESHOLD=5
+PASS_THRESHOLD="${2:-5}"
 score=0
 results=()
 
@@ -172,10 +173,25 @@ echo ""
 echo "  $familiarity_note"
 echo ""
 
+# ── Autonomy log ─────────────────────────────────────────────────────────────
+TICKET_NAME=$(basename "$TICKET_PATH")
+DATE=$(date +%Y-%m-%d)
+PATTERNS=$(sed -n '/## 7. File Targets/,/## 8./p' "$CONTRACT" \
+  | grep -oE '(lib|spec|db)/[a-z_/]+' \
+  | sed 's|/[^/]*$|/|' \
+  | sort -u | tr '\n' '|' | sed 's/|$//')
+
+if [ ! -f "$AUTONOMY_LOG" ]; then
+  mkdir -p "$(dirname "$AUTONOMY_LOG")"
+  echo "date,ticket,score,threshold,result,patterns" > "$AUTONOMY_LOG"
+fi
+
 if [ "$score" -ge "$PASS_THRESHOLD" ]; then
+  echo "$DATE,$TICKET_NAME,$score,$PASS_THRESHOLD,PASS,$PATTERNS" >> "$AUTONOMY_LOG"
   echo "==> PASS ($score/$PASS_THRESHOLD+ checks passed) — pipeline continues"
   exit 0
 else
+  echo "$DATE,$TICKET_NAME,$score,$PASS_THRESHOLD,FAIL,$PATTERNS" >> "$AUTONOMY_LOG"
   echo "==> FAIL ($score/6 — threshold $PASS_THRESHOLD/6) — human review required"
   exit 1
 fi

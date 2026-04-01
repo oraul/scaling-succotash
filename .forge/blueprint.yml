@@ -12,6 +12,7 @@ pipeline:
   - step: assess
     type: deterministic
     script: .forge/deterministic/assess/
+    threshold: 5
     on_fail: gate
     gate:
       label: Review contract and tasks

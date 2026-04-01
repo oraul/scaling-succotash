@@ -66,8 +66,9 @@ class Orchestrator
   # ── Step execution ─────────────────────────────────────────────────────────
 
   def run_deterministic(step)
-    script = "#{step['script']}run.sh"
-    system("bash #{script} #{@ticket_path}")
+    script    = "#{step['script']}run.sh"
+    threshold = step['threshold'] ? step['threshold'].to_s : ''
+    system("bash #{script} #{@ticket_path} #{threshold}".strip)
     $CHILD_STATUS.exitstatus
   end
 

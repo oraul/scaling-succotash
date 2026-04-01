@@ -60,9 +60,9 @@ Shell scripts. No LLM. Same input → same output.
 
 ## 6. Autonomy Path
 
-- [ ] Track Assess PASS/FAIL rates per task type
-- [ ] Tighten Assess thresholds as Compile quality is proven
-- [ ] Document when Phase 2 (Slack + AWS) is ready to begin
+- [x] Track Assess PASS/FAIL rates per task type
+- [x] Tighten Assess thresholds as Compile quality is proven
+- [x] Document when Phase 2 (Slack + AWS) is ready to begin
 
 ---
 
