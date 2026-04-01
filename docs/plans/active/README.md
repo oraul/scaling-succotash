@@ -2,7 +2,7 @@
 
 Tickets currently being worked on by the Forge pipeline.
 
-Each ticket is a folder. Copy `_template/` to get started.
+Each ticket is a folder. Copy `docs/plans/.template/` to get started.
 
 ## Naming
 

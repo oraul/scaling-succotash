@@ -15,7 +15,7 @@ FRG-XXXX-short-description/
 
 | Folder | Status | Description |
 |---|---|---|
-| `_template/` | — | Templates for brief.md and contract.md |
+| `.template/` | — | Templates for brief.md and contract.md |
 | `active/` | In progress | Tickets currently being worked on |
 | `shipped/` | Merged | Tickets whose PR has been merged to main |
 | `archived/` | Closed | Tickets that were cancelled, rejected, or abandoned |
