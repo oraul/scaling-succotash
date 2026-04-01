@@ -49,12 +49,12 @@ Shell scripts. No LLM. Same input → same output.
 
 ## 5. Blueprint Orchestrator
 
-- [ ] Define Claude CLI invocation pattern for Phase 1
-- [ ] Build Blueprint runner — reads `blueprint.yml`, executes steps in sequence
-- [ ] Implement retry counter (max 2 attempts before bail)
-- [ ] Implement bail output — original task, attempts 1+2, what still fails, agent diagnosis
-- [ ] Implement human gate routing (Assess FAIL → human → resume)
-- [ ] Implement PR creation on Validate PASS
+- [x] Define Claude CLI invocation pattern for Phase 1
+- [x] Build Blueprint runner — reads `blueprint.yml`, executes steps in sequence
+- [x] Implement retry counter (max 2 attempts before bail)
+- [x] Implement bail output — original task, attempts 1+2, what still fails, agent diagnosis
+- [x] Implement human gate routing (Assess FAIL → human → resume)
+- [x] Implement PR creation on Validate PASS
 
 ---
 
