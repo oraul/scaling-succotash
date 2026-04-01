@@ -7,9 +7,6 @@ produce reviewed, tested, merged code from a well-defined ticket.
 ## Pipeline
 
 ```
-[D] Fetch
-     │
-     ▼
 [A] Compile ──→ contract.md
      │
      ▼
@@ -41,8 +38,7 @@ produce reviewed, tested, merged code from a well-defined ticket.
 
 | Step | Type | Description |
 |---|---|---|
-| **Fetch** | Deterministic | Collects all context — ticket, source files, schema, git history, rule files. Shell script + MCP tools. Runs once. |
-| **Compile** | Agentic | Reads Fetch output → produces `contract.md`. Single source of truth for the full pipeline. |
+| **Compile** | Agentic | Reads brief, schema, lib/, spec/ directly → produces `contract.md`. Single source of truth for the full pipeline. |
 | **Plan** | Agentic | Reads contract → produces `tasks.md`. Structured checklist for Draft and Implement. |
 | **Assess** | Deterministic | Scores contract + tasks against quality checks. PASS auto-advances. FAIL routes to human review of both. |
 | **Draft** | Agentic | Writes RSpec specs from the contract. Defines done before any code is written. |
@@ -70,7 +66,6 @@ produce reviewed, tested, merged code from a well-defined ticket.
     draft.md
     implement.md
   deterministic/
-    fetch/           ← file reader + ticket reader
     assess/          ← contract + tasks scorer
     validate/        ← RSpec (affected) + Rubocop (changed)
     verify/          ← full RSpec + Rubocop

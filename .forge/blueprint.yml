@@ -1,9 +1,4 @@
 pipeline:
-  - step: fetch
-    type: deterministic
-    script: .forge/deterministic/fetch/
-    on_fail: abort
-
   - step: compile
     type: agentic
     spec: .forge/agentic/compile.md
