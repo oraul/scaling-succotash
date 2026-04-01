@@ -42,4 +42,5 @@ Address every technical concern. Self-review before finishing.
 - Write: implementation files to their target paths
 - Write: migrations to `db/migrate/`
 - Edit: `tasks.md` checkboxes only
-- Ruby LSP: diagnostics, hover, go-to-definition — use to validate method calls, catch errors, and navigate existing code before Validate runs
+- Shell: `bundle exec ruby -c <file>` — syntax check each new file before finishing
+- Shell: `bundle exec rubocop --autocorrect <file>` — lint and fix each new file before finishing
