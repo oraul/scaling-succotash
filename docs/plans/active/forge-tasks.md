@@ -7,10 +7,14 @@ Source of truth: `docs/architecture/forge.md`
 ## 1. Structure
 
 - [x] Create `.forge/agentic/` directory
-- [x] Create `.forge/contracts/` directory (contract storage)
-- [x] Define ticket naming convention — `FRG-XXXX-short-description/` folders in `docs/plans/active/`, moved to `docs/plans/shipped/` when PR merges
-- [x] Write `docs/plans/.template/brief.md` — human-written ticket template
-- [x] Write `docs/plans/.template/contract.md` — defines the 9 contract sections including Insights and Amendments
+- [x] Create `.forge/deterministic/` directory
+- [x] Define ticket structure — `FRG-XXXX/` folders in `docs/plans/active/`
+- [x] Write `docs/plans/.template/brief.md`
+- [x] Write `docs/plans/.template/contract.md`
+- [x] Write `docs/plans/.template/tasks.md`
+- [x] Write `docs/plans/.template/log.md`
+- [x] Create `docs/plans/shipped/` and `docs/plans/archived/`
+- [x] Write READMEs for all folders
 
 ---
 
@@ -20,32 +24,34 @@ Each file: TOC + Purpose + Always + Never + Tools. Max 100 lines.
 
 - [x] Write `.forge/agentic/compile.md`
 - [x] Write `.forge/agentic/plan.md`
-- [x] Write `.forge/agentic/draft.md` (include BetterSpecs always/never rules)
-- [x] Write `.forge/agentic/implement.md` (include Ruby/Sinatra always/never rules)
+- [x] Write `.forge/agentic/draft.md`
+- [x] Write `.forge/agentic/implement.md`
 
 ---
 
-## 3. Deterministic Steps
+## 3. Blueprint
+
+- [x] Write `.forge/blueprint.yml` — pipeline sequence, routing, gates
+
+---
+
+## 4. Deterministic Steps
 
 Shell scripts. No LLM. Same input → same output.
 
-- [ ] Write `Fetch` script — reads files, schema (`db/schema.rb`), git history, rule files
-- [ ] Fetch reads ticket from `docs/plans/active/` (no Jira for now)
-- [ ] Audit which MCP tools are available for Fetch (future Jira integration)
-- [ ] Write `Assess` script — scores contract against 6 checks, outputs PASS/FAIL
+- [ ] Write `.forge/deterministic/fetch/run.rb`
+- [ ] Write `.forge/deterministic/assess/run.rb` — scores contract + tasks, outputs PASS/FAIL
 - [ ] Define Assess pass/fail thresholds (Phase 1: low bar, Phase 2: tighten)
 - [ ] Implement task familiarity pattern matching for Assess
-- [ ] Write `Validate` script — RSpec on affected files + Rubocop on changed files
-- [ ] Write `Verify` script — full RSpec suite + full Rubocop
+- [ ] Write `.forge/deterministic/validate/run.rb` — RSpec on affected files + Rubocop on changed files
+- [ ] Write `.forge/deterministic/verify/run.rb` — full RSpec suite + full Rubocop
 
 ---
 
-## 4. Blueprint Orchestrator
+## 5. Blueprint Orchestrator
 
-The thing that runs the pipeline in sequence.
-
-- [ ] Define Claude CLI invocation pattern for Phase 1 (exact command + how context is passed)
-- [ ] Build Blueprint runner — executes Fetch → Compile → Assess → Draft → Implement → Validate → Verify in order
+- [ ] Define Claude CLI invocation pattern for Phase 1
+- [ ] Build Blueprint runner — reads `blueprint.yml`, executes steps in sequence
 - [ ] Implement retry counter (max 2 attempts before bail)
 - [ ] Implement bail output — original task, attempts 1+2, what still fails, agent diagnosis
 - [ ] Implement human gate routing (Assess FAIL → human → resume)
@@ -53,7 +59,7 @@ The thing that runs the pipeline in sequence.
 
 ---
 
-## 5. Autonomy Path
+## 6. Autonomy Path
 
 - [ ] Track Assess PASS/FAIL rates per task type
 - [ ] Tighten Assess thresholds as Compile quality is proven
@@ -61,7 +67,7 @@ The thing that runs the pipeline in sequence.
 
 ---
 
-## 6. Phase 2 (Deferred)
+## 7. Phase 2 (Deferred)
 
 - [ ] Slack invocation — trigger Forge from a Slack thread
 - [ ] AWS warm spot instances — replace Claude CLI with cloud runtime
