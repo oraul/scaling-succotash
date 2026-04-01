@@ -42,3 +42,4 @@ Address every technical concern. Self-review before finishing.
 - Write: implementation files to their target paths
 - Write: migrations to `db/migrate/`
 - Edit: `tasks.md` checkboxes only
+- Ruby LSP: diagnostics, hover, go-to-definition — use to validate method calls, catch errors, and navigate existing code before Validate runs
