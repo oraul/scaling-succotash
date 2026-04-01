@@ -32,6 +32,6 @@ truth for Draft and Implement. Output to `.forge/contracts/FRG-NNN-short-descrip
 
 ## Tools
 
-- Read: ticket from `docs/plans/active/`
+- Read: ticket brief from `docs/plans/active/FRG-XXXX/brief.md`
 - Read: source files, schema, git history, existing specs — from Fetch context
-- Write: contract to `.forge/contracts/`
+- Write: contract to `docs/plans/active/FRG-XXXX/contract.md` using `docs/plans/_template/contract.md`

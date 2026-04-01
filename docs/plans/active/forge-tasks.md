@@ -8,8 +8,9 @@ Source of truth: `docs/architecture/forge.md`
 
 - [x] Create `.forge/agentic/` directory
 - [x] Create `.forge/contracts/` directory (contract storage)
-- [x] Define ticket naming convention — `FRG-NNN-short-description.md` in `docs/plans/active/`, moved to `docs/plans/shipped/` when PR merges
-- [x] Write `.forge/contracts/template.md` — defines the 7 contract sections including Insights
+- [x] Define ticket naming convention — `FRG-XXXX-short-description/` folders in `docs/plans/active/`, moved to `docs/plans/shipped/` when PR merges
+- [x] Write `docs/plans/_template/brief.md` — human-written ticket template
+- [x] Write `docs/plans/_template/contract.md` — defines the 9 contract sections including Insights and Amendments
 
 ---
 

@@ -2,4 +2,5 @@
 
 Tickets that were cancelled, rejected, or abandoned.
 
-Move a file here from `active/` when the work is stopped for any reason. Keep the file for reference — it documents what was attempted and why it was stopped.
+Move the entire `FRG-XXXX/` folder here from `active/` when work stops.
+Keep both files for reference — they document what was attempted and why it stopped.

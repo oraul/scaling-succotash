@@ -2,10 +2,22 @@
 
 Tickets currently being worked on by the Forge pipeline.
 
-Files here are the input for the Fetch step. When a ticket's PR merges, move the file to `shipped/`. If the ticket is cancelled or abandoned, move it to `archived/`.
+Each ticket is a folder. Copy `_template/` to get started.
 
 ## Naming
 
-`FRG-NNN-short-description.md`
+`FRG-XXXX-short-description/`
 
-Example: `FRG-001-payment-retry.md`
+Example: `FRG-0001-payment-retry/`
+
+## Files
+
+| File | Author | Description |
+|---|---|---|
+| `brief.md` | Human | Goal, source, and notes for the ticket |
+| `contract.md` | Compile | Generated from brief. Source of truth for Draft + Implement |
+
+## Lifecycle
+
+When PR merges → move folder to `shipped/`.
+When cancelled → move folder to `archived/`.

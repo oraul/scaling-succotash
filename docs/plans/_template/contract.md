@@ -1,4 +1,4 @@
-# Contract: FRG-NNN-short-description
+# Contract: FRG-XXXX — Short Description
 
 ## Table of Contents
 1. [Source](#1-source)
@@ -15,9 +15,7 @@
 
 ## 1. Source
 
-Traceability back to the original request.
-
-- **Ticket:** `docs/plans/active/FRG-NNN-short-description.md`
+- **Ticket:** `docs/plans/active/FRG-XXXX/brief.md`
 - **Ref:** github.com/oraul/scaling-succotash/issues/NNN
 - **Original comment:** (paste or summarize what triggered this work)
 
@@ -25,7 +23,7 @@ Traceability back to the original request.
 
 ## 2. Business Rules
 
-What the feature must do. Translated from ticket language into precise engineering
+What the feature must do. Translated from brief language into precise engineering
 statements. No product jargon.
 
 - Rule 1
