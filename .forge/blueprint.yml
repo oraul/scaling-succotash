@@ -8,7 +8,6 @@ pipeline:
     type: agentic
     spec: .forge/agentic/plan.md
     on_fail: abort
-    on_pass: create_pr
 
   - step: assess
     type: deterministic

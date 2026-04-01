@@ -4,13 +4,13 @@
 # Forge — Blueprint Orchestrator
 #
 # Usage:
-#   .forge/run <ticket_path>                         start pipeline
-#   .forge/run <ticket_path> --resume approve        continue after gate
-#   .forge/run <ticket_path> --resume reject         abort at gate
-#   .forge/run <ticket_path> --resume suggestions    route back to draft
+#   .forge/run <ticket_path>
 #
 # Example:
 #   .forge/run docs/plans/active/FRG-0001-payment-retry
+#
+# Gates pause the pipeline and prompt the human directly in the terminal.
+# Human reviews files in their editor, types a decision, pipeline continues.
 
 require 'yaml'
 
@@ -18,43 +18,23 @@ BLUEPRINT_PATH = '.forge/blueprint.yml'
 STATE_FILE     = '.forge_state.yml'
 
 class Orchestrator
-  def initialize(ticket_path, resume: nil)
+  def initialize(ticket_path)
     @ticket_path = ticket_path
-    @resume      = resume
     @blueprint   = YAML.load_file(BLUEPRINT_PATH)
     @state_path  = "#{ticket_path}/#{STATE_FILE}"
     @state       = load_state
   end
 
   def run
-    @resume ? handle_resume : run_from('compile')
+    run_from('compile')
   end
 
   private
 
-  # ── Resume after human gate ────────────────────────────────────────────────
-
-  def handle_resume
-    gate_next = @state['gate_next'] or abort 'No gate state found — nothing to resume'
-
-    case @resume
-    when 'approve'
-      run_from(gate_next.fetch('on_approve'))
-    when 'reject'
-      abort '==> Rejected at gate — pipeline ended.'
-    when 'suggestions'
-      target = gate_next.fetch('on_suggestions') { abort 'Gate has no suggestions route' }
-      run_from(target)
-    else
-      abort "Unknown resume value: #{@resume}. Use approve / reject / suggestions"
-    end
-  end
-
   # ── Step runner ────────────────────────────────────────────────────────────
 
   def run_from(start_step)
-    start_index = step_index(start_step)
-    index       = start_index
+    index = step_index(start_step)
 
     while index < pipeline.length
       step   = pipeline[index]
@@ -63,10 +43,7 @@ class Orchestrator
       case result
       when :next  then index += 1
       when :abort then abort "==> Pipeline aborted at #{step['step']}."
-      when :gate  then return  # paused — waiting for human
-      when String
-        # Jump to named step (retry loop)
-        index = step_index(result)
+      when String then index = step_index(result)  # jump to named step
       end
     end
 
@@ -83,12 +60,7 @@ class Orchestrator
 
     exit_code = type == 'deterministic' ? run_deterministic(step) : run_agentic(step)
 
-    if exit_code.zero?
-      create_pr if step['on_pass'] == 'create_pr'
-      post_step_gate(step) || :next
-    else
-      handle_failure(step, exit_code)
-    end
+    exit_code.zero? ? handle_pass(step) : handle_failure(step)
   end
 
   # ── Step execution ─────────────────────────────────────────────────────────
@@ -104,96 +76,86 @@ class Orchestrator
     ticket_note = "Ticket path: #{@ticket_path}"
 
     # Phase 1 — Claude CLI invocation
-    # Passes the agentic spec as the prompt and the ticket path as context.
-    # Claude reads all required files directly from the repo (brief, schema, lib/, spec/).
+    # Passes the agentic spec as the prompt. Claude reads all required files
+    # directly from the repo (brief, schema, lib/, spec/).
     system("claude --print -p \"$(cat #{spec})\n\n#{ticket_note}\"")
     $CHILD_STATUS.exitstatus
   end
 
+  # ── Pass routing ───────────────────────────────────────────────────────────
+
+  def handle_pass(step)
+    # Check if a gate fires after this step on pass (e.g. pr_review after validate)
+    gate_config = (@blueprint['gates'] || {}).values.find do |g|
+      g['after'] == step['step'] && g['condition'] == 'on_pass'
+    end
+
+    gate_config ? prompt_gate(gate_config) : :next
+  end
+
   # ── Failure routing ────────────────────────────────────────────────────────
 
-  def handle_failure(step, _exit_code)
+  def handle_failure(step)
     name    = step['step']
     on_fail = step['on_fail']
 
     case on_fail
     when 'abort'
-      puts "  [fail] #{name} failed — on_fail: abort"
+      puts "  [fail] #{name} failed — aborting"
       :abort
     when 'gate'
-      pr_comment("❌ Assess failed — contract/tasks need review. See PR for details.")
-      open_gate(step['gate'])
+      prompt_gate(step['gate'])
     when String
-      # Retry with counter — bail to gate after max attempts
-      retries  = @state.dig('retry_counts', name) || 0
-      max      = step.fetch('retry', 0)
+      retries = (@state['retry_counts'][name] ||= 0)
+      max     = step.fetch('retry', 0)
 
       if retries < max
-        @state['retry_counts']       ||= {}
-        @state['retry_counts'][name]   = retries + 1
+        @state['retry_counts'][name] += 1
         save_state
         puts "  [retry #{retries + 1}/#{max}] routing back to #{on_fail}"
-        on_fail  # return step name → run_from jumps there
+        on_fail
       else
         puts "  [bail] #{name} failed after #{max} retries"
-        pr_comment("🛑 Validate bailed after #{max} retries — add guidance to `#{@ticket_path}/log.md` then resume")
-        open_gate(step['gate'])
+        prompt_gate(step['gate'])
       end
     end
   end
 
-  # ── Gates ──────────────────────────────────────────────────────────────────
+  # ── Human gate — interactive terminal prompt ───────────────────────────────
 
-  def post_step_gate(step)
-    # Check if a gate fires after this step on pass (e.g. pr_review after validate)
-    gate_config = (@blueprint['gates'] || {}).values.find do |g|
-      g['after'] == step['step'] && g['condition'] == 'on_pass'
+  def prompt_gate(gate)
+    label    = gate['label']
+    guidance = gate['guidance']
+    options  = gate_options(gate)
+
+    puts ''
+    puts "  🚪 #{label}"
+    puts "     Review: #{@ticket_path}/" if guidance.nil?
+    puts "     Guidance file: #{@ticket_path}/#{guidance}" if guidance
+    puts ''
+    puts "  Options: #{options.keys.join(' / ')}"
+    print '  Decision: '
+
+    decision = $stdin.gets&.strip&.downcase
+
+    unless options.key?(decision)
+      puts "  Unknown input — expected: #{options.keys.join(', ')}"
+      return prompt_gate(gate)
     end
-    return nil unless gate_config
 
-    pr_comment('✅ Validate passed — ready for code review')
-    open_gate(gate_config)
+    route = options[decision]
+    puts "  -> #{decision}: routing to #{route}"
+
+    route == 'abort' ? :abort : route
   end
 
-  def open_gate(gate)
-    pr_url = @state['pr_url']
-
-    puts ''
-    puts "  🚪 GATE: #{gate['label']}"
-    puts "     PR: #{pr_url}" if pr_url
-    puts "     guidance: #{@ticket_path}/#{gate['guidance']}" if gate['guidance']
-    puts ''
-    puts '  Resume with:'
-    puts "    .forge/run #{@ticket_path} --resume approve"
-    puts "    .forge/run #{@ticket_path} --resume reject"
-    puts "    .forge/run #{@ticket_path} --resume suggestions" if gate['on_suggestions']
-
-    save_state(gate_next: gate.slice('on_approve', 'on_reject', 'on_suggestions'), status: 'waiting_for_gate')
-    :gate
-  end
-
-  # ── PR creation + comments ─────────────────────────────────────────────────
-
-  def create_pr
-    return if @state['pr_url']  # already created
-
-    branch      = `git branch --show-current`.strip
-    ticket_name = File.basename(@ticket_path)
-    contract    = "#{@ticket_path}/contract.md"
-    body        = File.exist?(contract) ? File.read(contract) : ticket_name
-
-    puts "  -> opening draft PR: #{branch}"
-    pr_url = `gh pr create --title "#{ticket_name}" --body "#{body.gsub('"', '\\"')}" --draft`.strip
-
-    save_state(pr_url: pr_url)
-    puts "  -> PR: #{pr_url}"
-  end
-
-  def pr_comment(message)
-    pr_url = @state['pr_url']
-    return unless pr_url
-
-    system("gh pr comment #{pr_url} --body \"#{message}\"")
+  def gate_options(gate)
+    {}.tap do |opts|
+      opts['approve']     = gate['on_approve']     if gate['on_approve']
+      opts['reject']      = 'abort'                if gate['on_reject'] == 'abort'
+      opts['suggestions'] = gate['on_suggestions'] if gate['on_suggestions']
+      opts['edit']        = gate['on_edit']        if gate['on_edit']
+    end
   end
 
   # ── State ──────────────────────────────────────────────────────────────────
@@ -202,8 +164,7 @@ class Orchestrator
     File.exist?(@state_path) ? YAML.load_file(@state_path) : { 'retry_counts' => {} }
   end
 
-  def save_state(overrides = {})
-    @state.merge!(overrides.transform_keys(&:to_s))
+  def save_state
     File.write(@state_path, @state.to_yaml)
   end
 
@@ -223,7 +184,6 @@ end
 
 # ── Entry point ──────────────────────────────────────────────────────────────
 
-ticket_path = ARGV[0] or abort 'Usage: .forge/run <ticket_path> [--resume approve|reject|suggestions]'
-resume      = ARGV[1] == '--resume' ? ARGV[2] : nil
+ticket_path = ARGV[0] or abort 'Usage: .forge/run <ticket_path>'
 
-Orchestrator.new(ticket_path, resume: resume).run
+Orchestrator.new(ticket_path).run
