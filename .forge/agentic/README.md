@@ -33,5 +33,6 @@ Each file defines how Claude should behave for that step. Max 100 lines.
 | File | Step | Role |
 |---|---|---|
 | `compile.md` | Compile | Transforms Fetch output into the contract document |
+| `plan.md` | Plan | Reads contract → produces tasks.md checklist |
 | `draft.md` | Draft | Writes RSpec specs from the approved contract |
 | `implement.md` | Implement | Implements code to make all specs pass |
