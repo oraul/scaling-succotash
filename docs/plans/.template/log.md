@@ -1,34 +1,42 @@
 # Log: FRG-XXXX — Short Description
 
 Running record of human feedback during the pipeline run.
-Contract, plan, and tasks are immutable — feedback lives here.
+Contract, plan, and tasks are immutable — all feedback lives here.
 
----
+## Entry Format
 
-## Assess Gate
+```
+## [YYYY-MM-DD] [STEP] — [EVENT]
+**Trigger:** what caused this entry
+**Feedback:** what the human said or decided
+**Action:** what the pipeline does next
+```
 
-> Human feedback when Assess fails and contract + tasks are reviewed.
+### Events
 
-| Date | Type | Notes |
+| Event | Step | Trigger |
 |---|---|---|
-| YYYY-MM-DD | Approve / Reject / Edit | ... |
+| `assess-edit` | Assess | Human edits contract or tasks at gate |
+| `assess-reject` | Assess | Human rejects — pipeline ends |
+| `validate-bail` | Validate | Failed after 2 attempts — human gives guidance |
+| `pr-suggestions` | PR Review | Human leaves suggestions before approving |
+| `pr-reject` | PR Review | Human rejects — pipeline ends |
 
 ---
 
-## Validate Bail
+<!-- entries below, newest last -->
 
-> Human guidance when Validate fails after 2 attempts.
+## [YYYY-MM-DD] Assess — assess-edit
+**Trigger:** Assess scored 4/6 — acceptance criteria not testable, file targets missing
+**Feedback:** "Add the edge case for deleted users. Missing spec for PaymentAttempt model."
+**Action:** Back to Compile → Plan → Assess
 
-| Date | Attempt | What failed | Guidance given |
-|---|---|---|---|
-| YYYY-MM-DD | 1 / 2 | ... | ... |
+## [YYYY-MM-DD] Validate — validate-bail
+**Trigger:** Validate failed attempt 2 — PaymentRetryService spec timeout error
+**Feedback:** "The retry logic needs a mutex. Check existing PaymentProcessor for the pattern."
+**Action:** Back to Draft with guidance
 
----
-
-## PR Review
-
-> Human suggestions from Gate 2 code review.
-
-| Date | Suggestion | Status |
-|---|---|---|
-| YYYY-MM-DD | ... | Applied / Rejected |
+## [YYYY-MM-DD] PR Review — pr-suggestions
+**Trigger:** Human reviewed PR and left suggestions
+**Feedback:** "Extract the retry delay into a constant. Add a comment on the idempotency check."
+**Action:** Back to Draft → Implement → Validate
