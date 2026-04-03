@@ -43,7 +43,7 @@ class Orchestrator
       case result
       when :next  then index += 1
       when :abort then abort "==> Pipeline aborted at #{step['step']}."
-      when String then index = step_index(result)  # jump to named step
+      when String then index = step_index(result)
       end
     end
 
@@ -86,12 +86,15 @@ class Orchestrator
   # ── Pass routing ───────────────────────────────────────────────────────────
 
   def handle_pass(step)
-    # Check if a gate fires after this step on pass (e.g. pr_review after validate)
     gate_config = (@blueprint['gates'] || {}).values.find do |g|
       g['after'] == step['step'] && g['condition'] == 'on_pass'
     end
+    return :next unless gate_config
 
-    gate_config ? prompt_gate(gate_config) : :next
+    # Create PR before asking human to review code
+    create_pr if step['step'] == 'validate'
+
+    prompt_gate(gate_config, step: step['step'], event: 'pr-review')
   end
 
   # ── Failure routing ────────────────────────────────────────────────────────
@@ -105,7 +108,7 @@ class Orchestrator
       puts "  [fail] #{name} failed — aborting"
       :abort
     when 'gate'
-      prompt_gate(step['gate'])
+      prompt_gate(step['gate'], step: name, event: 'assess-gate')
     when String
       retries = (@state['retry_counts'][name] ||= 0)
       max     = step.fetch('retry', 0)
@@ -117,14 +120,14 @@ class Orchestrator
         on_fail
       else
         puts "  [bail] #{name} failed after #{max} retries"
-        prompt_gate(step['gate'])
+        prompt_gate(step['gate'], step: name, event: 'validate-bail')
       end
     end
   end
 
   # ── Human gate — interactive terminal prompt ───────────────────────────────
 
-  def prompt_gate(gate)
+  def prompt_gate(gate, step:, event:)
     label    = gate['label']
     guidance = gate['guidance']
     options  = gate_options(gate)
@@ -141,10 +144,11 @@ class Orchestrator
 
     unless options.key?(decision)
       puts "  Unknown input — expected: #{options.keys.join(', ')}"
-      return prompt_gate(gate)
+      return prompt_gate(gate, step: step, event: event)
     end
 
     route = options[decision]
+    write_log(step: step, event: event, decision: decision, action: route)
     puts "  -> #{decision}: routing to #{route}"
 
     route == 'abort' ? :abort : route
@@ -157,6 +161,34 @@ class Orchestrator
       opts['suggestions'] = gate['on_suggestions'] if gate['on_suggestions']
       opts['edit']        = gate['on_edit']        if gate['on_edit']
     end
+  end
+
+  # ── PR creation ────────────────────────────────────────────────────────────
+
+  def create_pr
+    branch      = `git branch --show-current`.strip
+    ticket_name = File.basename(@ticket_path)
+    contract    = "#{@ticket_path}/contract.md"
+    body        = File.exist?(contract) ? File.read(contract) : ticket_name
+
+    puts "  -> creating PR: #{branch}"
+    system("gh pr create --title \"#{ticket_name}\" --body \"#{body.gsub('"', '\\"')}\" --draft")
+  end
+
+  # ── Log ────────────────────────────────────────────────────────────────────
+
+  def write_log(step:, event:, decision:, action:)
+    log_path = "#{@ticket_path}/log.md"
+    date     = Time.now.strftime('%Y-%m-%d')
+    entry    = <<~ENTRY
+
+      ## [#{date}] #{step.upcase} — #{event}
+      **Trigger:** gate reached after #{step}
+      **Feedback:** human decision — #{decision}
+      **Action:** #{action == 'abort' ? 'pipeline aborted' : "routing to #{action}"}
+    ENTRY
+
+    File.open(log_path, 'a') { |f| f.write(entry) }
   end
 
   # ── State ──────────────────────────────────────────────────────────────────
