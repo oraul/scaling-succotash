@@ -33,8 +33,10 @@ pass. Address every technical concern. Run specs locally before finishing.
 - Return a plain result object or raise a typed error — never return raw Sequel datasets
 
 **Models** (`lib/models/`) — data + persistence only:
-- File naming: `user_model.rb` → class `UserModel < Sequel::Model(:users)`
-- Associations, validations, scopes — no use case calls, no HTTP concerns
+- File naming: no suffix — `user.rb` → class `User < Sequel::Model(:users)`
+- Associations, scopes, and validations via `plugin :validation_helpers`
+- Validations live in `def validate; super; validates_presence [...]; end`
+- No use case calls, no HTTP concerns
 
 ## Always
 
