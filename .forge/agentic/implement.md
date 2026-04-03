@@ -34,9 +34,14 @@ pass. Address every technical concern. Run specs locally before finishing.
 
 **Models** (`lib/models/`) — data + persistence only:
 - File naming: no suffix — `user.rb` → class `User < Sequel::Model(:users)`
-- Associations, scopes, and validations via `plugin :validation_helpers`
+- Associations, scopes, and **data integrity validations** via `plugin :validation_helpers`
+- Model validations: presence, uniqueness, format, length — "is this data valid to persist?"
 - Validations live in `def validate; super; validates_presence [...]; end`
 - No use case calls, no HTTP concerns
+
+**Validation separation:**
+- Model → data integrity (Sequel) — runs on every save
+- Use Case → business rules (plain Ruby) — authorization, state, domain constraints
 
 ## Always
 
