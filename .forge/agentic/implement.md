@@ -14,29 +14,29 @@ pass. Address every technical concern. Run specs locally before finishing.
 **Order of operations:**
 1. Read contract.md, tasks.md, and all spec files Draft wrote
 2. Create migrations first if Domain Map has new or modified tables
-3. Implement in dependency order: models → services → routes
+3. Implement in dependency order: models → use cases → routes
 4. Run specs after each file — fix immediately if red
 5. Self-review checklist before submitting
 
 ## Ruby layer responsibilities
 
 **Routes** (`lib/routes/`) — HTTP boundary only:
-- Parse request params, call one service, render JSON response
+- Parse request params, call one use case, render JSON response
 - Authentication check via helper if required
 - No business logic, no DB queries, no conditionals beyond HTTP status
 
-**Services** (`lib/services/`) — all business logic lives here:
+**Use Cases** (`lib/use_cases/`) — all business logic lives here:
 - One public entry point: `def self.call(...)` delegating to `new(...).execute`
 - Hide all steps (validation, DB writes, side effects) inside `#execute`
 - Return a plain result object or raise a typed error — never return raw Sequel datasets
 
 **Models** (`lib/models/`) — data + persistence only:
 - Sequel::Model subclass, associations, validations, scopes
-- No service calls, no HTTP concerns
+- No use case calls, no HTTP concerns
 
 ## Always
 
-- Design services as deep modules: simple `.call` interface, all complexity inside
+- Design use cases as deep modules: simple `.call` interface, all complexity inside
 - Run `bundle exec rspec <spec_file>` after implementing each file — fix before moving on
 - Run `bundle exec rubocop --autocorrect <file>` on every new or modified file
 - Follow file targets from contract exactly — no extra files
@@ -50,8 +50,8 @@ pass. Address every technical concern. Run specs locally before finishing.
 ## Never
 
 - Put DB queries or business logic in routes
-- Expose service internals as constructor parameters (shallow interface)
-- Call services from models or models from services (no cross-layer deps)
+- Expose use case internals as constructor parameters (shallow interface)
+- Call use cases from models or models from use cases (no cross-layer deps)
 - Move on to the next file while specs are still failing
 - Create files not listed in contract File Targets
 - Use raw SQL or ActiveRecord
@@ -64,8 +64,8 @@ Before finishing, confirm:
 
 - [ ] All specs in tasks.md pass: `bundle exec rspec <spec_files>`
 - [ ] No Rubocop offenses on any new file
-- [ ] Every route: params → one service call → JSON response
-- [ ] Every service: one `.call` entry point, complexity hidden in `#execute`
+- [ ] Every route: params → one use case call → JSON response
+- [ ] Every use case: one `.call` entry point, complexity hidden in `#execute`
 - [ ] Every model: Sequel only, no business rules
 - [ ] Every technical concern addressed or explicitly noted
 

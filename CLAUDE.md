@@ -14,7 +14,7 @@ Stack: Ruby >= 3.3, Sinatra, Sequel, SQLite, Async gem, Falcon, RSpec
 ## Rules
 - Sequel only — no raw SQL
 - Async for any I/O-bound work
-- No logic in routes — use service objects in `lib/services/`
+- No logic in routes — use use cases in `lib/use_cases/`
 - All files must have `# frozen_string_literal: true`
 - Never expose private URLs (session links, internal endpoints, tokens) in commit messages, comments, or any tracked file
 - All environment variables must be configured as GitHub secrets — never hardcode values in `render.yaml`, workflows, or any committed file
