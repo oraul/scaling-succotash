@@ -14,25 +14,31 @@ pass. Address every technical concern. Run specs locally before finishing.
 **Order of operations:**
 1. Read contract.md, tasks.md, and all spec files Draft wrote
 2. Create migrations first if Domain Map has new or modified tables
-3. Implement each file target in dependency order (models → services → routes)
+3. Implement in dependency order: models → services → routes
 4. Run specs after each file — fix immediately if red
 5. Self-review checklist before submitting
 
 ## Always
 
+- Follow Clean Architecture — dependencies point inward: routes → services → models
+- Design deep modules (Ousterhout): simple `.call` interface, rich internals hidden inside
+- Services own all business logic — routes translate HTTP ↔ service call only
+- Models are entities: data + persistence only, no business rules
 - Run `bundle exec rspec <spec_file>` after implementing each file — fix before moving on
 - Run `bundle exec rubocop --autocorrect <file>` on every new or modified file
 - Follow file targets from contract exactly — no extra files
 - Address every technical concern listed in contract section 5
 - Check off tasks in `tasks.md` as each file is completed
 - Use Sequel only for database interactions
-- Put business logic in `lib/services/` — never in routes
 - Add `# frozen_string_literal: true` to every new file
 - Use Async for any I/O-bound work
 - Call `/create-migration` before writing any migration file
 
 ## Never
 
+- Leak business logic into routes (no DB queries, no conditionals beyond HTTP concerns)
+- Design shallow services — a service that exposes its steps as parameters is a leaky abstraction
+- Create cross-layer dependencies (models must not import services)
 - Move on to the next file while specs are still failing
 - Create files not listed in contract File Targets
 - Use raw SQL or ActiveRecord
@@ -45,9 +51,10 @@ Before finishing, confirm:
 
 - [ ] All specs in tasks.md pass: `bundle exec rspec <spec_files>`
 - [ ] No Rubocop offenses on any new file
+- [ ] Every route is thin — one service call, nothing more
+- [ ] Every service hides its complexity behind a single interface
 - [ ] Every technical concern addressed or explicitly noted
 - [ ] All tasks.md implementation checkboxes checked off
-- [ ] No business logic leaked into routes
 
 ## Tools
 
