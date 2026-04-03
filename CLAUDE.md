@@ -15,7 +15,7 @@ Stack: Ruby >= 3.3, Sinatra, Sequel, SQLite, Async gem, Falcon, RSpec
 - Sequel only — no raw SQL
 - Async for any I/O-bound work
 - No logic in routes — use use cases in `lib/use_cases/` (suffix: `_use_case.rb`)
-- File naming follows folder suffix: `_use_case.rb`, `_model.rb`, `_route.rb`
+- File naming follows folder suffix: `_use_case.rb`, `_route.rb` — models are the exception: `user.rb` → `User`
 - All files must have `# frozen_string_literal: true`
 - Never expose private URLs (session links, internal endpoints, tokens) in commit messages, comments, or any tracked file
 - All environment variables must be configured as GitHub secrets — never hardcode values in `render.yaml`, workflows, or any committed file

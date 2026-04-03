@@ -13,6 +13,9 @@ produce reviewed, tested, merged code from a well-defined ticket.
 [A] Plan ──→ tasks.md
      │
      ▼
+[A] Judge ──→ contract Insights
+     │
+     ▼
 [D] Assess
      ├── PASS ──→ continue
      └── FAIL ──→ 🚪 human reviews contract + tasks
@@ -40,6 +43,7 @@ produce reviewed, tested, merged code from a well-defined ticket.
 |---|---|---|
 | **Compile** | Agentic | Reads brief, schema, lib/, spec/ directly → produces `contract.md`. Single source of truth for the full pipeline. |
 | **Plan** | Agentic | Reads contract → produces `tasks.md`. Structured checklist for Draft and Implement. |
+| **Judge** | Agentic | Reviews contract + tasks for design issues — N+1s, race conditions, layer violations. Writes findings to contract Insights. Human decides at Assess gate. |
 | **Assess** | Deterministic | Scores contract + tasks against quality checks. PASS auto-advances. FAIL routes to human review of both. |
 | **Draft** | Agentic | Writes RSpec specs from the contract. Defines done before any code is written. |
 | **Implement** | Agentic | Implements code to make all specs pass. Self-reviews before submitting. |
@@ -63,6 +67,7 @@ produce reviewed, tested, merged code from a well-defined ticket.
     README.md        ← how to write agentic specs
     compile.md
     plan.md
+    judge.md
     draft.md
     implement.md
   deterministic/
