@@ -9,6 +9,7 @@ AllCops:
     - 'bin/**/*'
     - 'db/migrate/*.rb'
     - 'vendor/**/*'
+    - '.forge/**/*'
 
 RSpec/MultipleExpectations:
   Enabled: false

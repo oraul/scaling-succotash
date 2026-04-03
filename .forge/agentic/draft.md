@@ -46,6 +46,7 @@ Weak specs give Implement a false sense of done. Flag the gap instead.
 ## Tools
 
 - Read: `docs/plans/active/FRG-XXXX/contract.md`
+- Read: `docs/plans/active/FRG-XXXX/tasks.md` — authoritative list of spec files to write
 - Read: `spec/` — existing specs for patterns and conventions
 - Read: `lib/**/*.rb` — understand what already exists
 - Write: spec files to paths listed in tasks.md
