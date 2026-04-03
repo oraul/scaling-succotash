@@ -21,18 +21,20 @@ pass. Address every technical concern. Run specs locally before finishing.
 ## Ruby layer responsibilities
 
 **Routes** (`lib/routes/`) — HTTP boundary only:
+- File naming: `users_route.rb` → class `UsersRoute`
 - Parse request params, call one use case, render JSON response
 - Authentication check via helper if required
 - No business logic, no DB queries, no conditionals beyond HTTP status
 
 **Use Cases** (`lib/use_cases/`) — all business logic lives here:
+- File naming: `create_user_use_case.rb` → class `CreateUserUseCase`
 - One public entry point: `def self.call(...)` delegating to `new(...).execute`
 - Hide all steps (validation, DB writes, side effects) inside `#execute`
 - Return a plain result object or raise a typed error — never return raw Sequel datasets
 
 **Models** (`lib/models/`) — data + persistence only:
-- Sequel::Model subclass, associations, validations, scopes
-- No use case calls, no HTTP concerns
+- File naming: `user_model.rb` → class `UserModel < Sequel::Model(:users)`
+- Associations, validations, scopes — no use case calls, no HTTP concerns
 
 ## Always
 
