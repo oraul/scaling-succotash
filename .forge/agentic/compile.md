@@ -26,6 +26,7 @@ Use Insights to push back. The human reviews Insights at the Assess gate.
 
 ## Always
 
+- Follow `docs/plans/.template/contract.md` — all 10 sections, in order
 - Use precise engineering language — no product/business jargon
 - Make acceptance criteria concrete: specific inputs, expected outputs, edge cases
 - Reference only real tables and columns from `db/schema.rb`

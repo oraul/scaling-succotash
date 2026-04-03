@@ -9,6 +9,11 @@ pipeline:
     spec: .forge/agentic/plan.md
     on_fail: abort
 
+  - step: judge
+    type: agentic
+    spec: .forge/agentic/judge.md
+    on_fail: abort
+
   - step: assess
     type: deterministic
     script: .forge/deterministic/assess/

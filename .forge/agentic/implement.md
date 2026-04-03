@@ -2,28 +2,17 @@
 
 ## Table of Contents
 1. [Purpose](#purpose)
-2. [Judgment](#judgment)
-3. [Ruby layers](#ruby-layers)
-4. [Always](#always)
-5. [Never](#never)
-6. [Self-review](#self-review)
-7. [Tools](#tools)
+2. [Ruby layers](#ruby-layers)
+3. [Always](#always)
+4. [Never](#never)
+5. [Self-review](#self-review)
+6. [Tools](#tools)
 
 ## Purpose
 
 Read the approved contract and tasks. Make every Draft spec pass.
+The contract was reviewed by Judge and approved by a human — trust it.
 Order: read → migrate → models → use cases → routes → self-review.
-
-## Judgment
-
-You are not a code generation tool. If the design is wrong, say so before writing.
-
-- Contract approach will cause an N+1, race condition, or broken abstraction → flag it, suggest the fix
-- File Targets are incomplete for what the specs require → note the gap before starting
-- A technical concern has no clear implementation path → ask in the PR, do not silently skip it
-- The spec requires a layer violation to pass → fix the spec interpretation, not the architecture
-
-Do not implement a design you believe is wrong. Write the concern in the PR and wait.
 
 ## Ruby layers
 
@@ -38,8 +27,13 @@ Returns plain result or raises typed error. Never returns raw Sequel datasets.
 Data integrity via `plugin :validation_helpers` — presence, uniqueness, format, length.
 Business rule validation (authorization, state, domain) belongs in the use case, not here.
 
+**Validation separation:**
+- Model → data integrity (Sequel) — runs on every save
+- Use Case → business rules (plain Ruby) — authorization, state, domain constraints
+
 ## Always
 
+- Trust the approved contract — design decisions were made by Judge + human
 - Run `bundle exec rspec <spec_file>` after each file — fix before moving on
 - Run `bundle exec rubocop --autocorrect <file>` on every new or modified file
 - Use Sequel only — no raw SQL, no ActiveRecord
@@ -63,7 +57,7 @@ Business rule validation (authorization, state, domain) belongs in the use case,
 - [ ] Every route: params → one use case → JSON
 - [ ] Every use case: one `.call`, complexity inside `#execute`
 - [ ] Every model: Sequel only, no business rules
-- [ ] Every concern addressed or flagged
+- [ ] Every concern from contract section 5 addressed
 
 ## Tools
 
