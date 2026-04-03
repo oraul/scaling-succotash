@@ -39,18 +39,18 @@ pipeline:
     type: deterministic
     script: .forge/deterministic/validate/
     retry: 2
-    on_fail: draft
+    on_fail: implement
     on_bail: gate
     gate:
       label: Validate failed after 2 attempts — guidance needed
       guidance: log.md
-      on_approve: draft
+      on_approve: implement
       on_reject: abort
 
   - step: verify
     type: deterministic
     script: .forge/deterministic/verify/
-    on_fail: draft
+    on_fail: implement
 
 gates:
   pr_review:
@@ -59,4 +59,4 @@ gates:
     label: PR review
     on_approve: verify
     on_reject: abort
-    on_suggestions: draft
+    on_suggestions: implement
