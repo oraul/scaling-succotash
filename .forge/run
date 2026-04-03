@@ -171,6 +171,7 @@ class Orchestrator
       return
     end
 
+
     branch      = `git branch --show-current`.strip
     ticket_name = File.basename(@ticket_path)
     contract    = "#{@ticket_path}/contract.md"
