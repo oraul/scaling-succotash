@@ -166,6 +166,12 @@ class Orchestrator
   # ── PR creation ────────────────────────────────────────────────────────────
 
   def create_pr
+    unless system('which gh > /dev/null 2>&1')
+      puts '  [warn] gh CLI not found — skipping PR creation. Create PR manually before approving gate.'
+      return
+    end
+
+
     branch      = `git branch --show-current`.strip
     ticket_name = File.basename(@ticket_path)
     contract    = "#{@ticket_path}/contract.md"

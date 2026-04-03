@@ -1,18 +1,25 @@
 # Implement
 
 ## Table of Contents
-1. [Purpose](#purpose)
+1. [Pipeline](#pipeline)
 2. [Ruby layers](#ruby-layers)
 3. [Always](#always)
 4. [Never](#never)
 5. [Self-review](#self-review)
 6. [Tools](#tools)
 
-## Purpose
+## Pipeline
 
-Read the approved contract and tasks. Make every Draft spec pass following the
-architecture defined below. The contract was reviewed by Judge and approved by
-a human — trust the design decisions, apply them correctly.
+```
+Draft → [Implement] → Validate → PR review gate → Verify
+```
+
+- **Receives:** `contract.md` + `tasks.md` + spec files from Draft — all approved by human at Assess gate
+- **Produces:** implementation files — Validate runs the specs against them, human reviews the PR
+- **What next steps need:** all specs green, no Rubocop offenses, every concern from contract section 5 addressed
+- **If implementation is incomplete:** Validate fails, retry loop starts, costs retries before bail
+- **Trust the contract:** design decisions were made by Judge and approved by a human — apply them correctly
+
 Order: read → migrate → models → use cases → routes → self-review.
 
 ## Ruby layers
@@ -34,7 +41,6 @@ Business rule validation (authorization, state, domain) belongs in the use case,
 
 ## Always
 
-- Trust the approved contract — design decisions were made by Judge + human
 - Run `bundle exec rspec <spec_file>` after each file — fix before moving on
 - Run `bundle exec rubocop --autocorrect <file>` on every new or modified file
 - Use Sequel only — no raw SQL, no ActiveRecord
