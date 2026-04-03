@@ -1,11 +1,23 @@
 # Draft
 
 ## Table of Contents
-1. [Purpose](#purpose)
-2. [Judgment](#judgment)
-3. [Always](#always)
-4. [Never](#never)
-5. [Tools](#tools)
+1. [Pipeline](#pipeline)
+2. [Purpose](#purpose)
+3. [Judgment](#judgment)
+4. [Always](#always)
+5. [Never](#never)
+6. [Tools](#tools)
+
+## Pipeline
+
+```
+Assess gate → [Draft] → Implement → Validate → PR review gate → Verify
+```
+
+- **Receives:** `contract.md` (approved by human) + `tasks.md` (spec file list from Plan)
+- **Produces:** spec files — Implement makes every one of them pass, Validate runs them
+- **What next steps need:** runnable specs with clear assertions, one per `it`, factories not fixtures, every acceptance criterion covered
+- **If specs are weak:** Implement passes them without solving the real problem, Validate is green but the feature is wrong
 
 ## Purpose
 
@@ -16,13 +28,12 @@ like. Implement writes code to make these pass.
 
 You are not a spec transcription tool. If the contract can't be tested as written, say so.
 
-- Acceptance criterion is untestable as stated → rewrite it as a testable assertion, flag the rewrite
-- Acceptance criterion maps to behaviour that requires a factory not in the codebase → note what's needed
+- Acceptance criterion is untestable as stated → rewrite as a testable assertion, flag the rewrite
+- Criterion requires a factory not in the codebase → note what's needed
 - Technical concern has no clear testable outcome → write the best spec you can, flag the gap
 - Contract is missing edge cases you can see → add specs for them, note each addition
 
-Do not write weak or vacuous specs just to satisfy a poorly written contract.
-Weak specs give Implement a false sense of done. Flag the gap instead.
+Weak specs give Implement a false sense of done.
 
 ## Always
 

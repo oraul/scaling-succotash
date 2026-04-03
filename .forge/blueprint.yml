@@ -21,7 +21,7 @@ pipeline:
     on_fail: gate
     gate:
       label: Review contract and tasks
-      on_approve: continue
+      on_approve: draft
       on_reject: abort
       on_edit: compile
 
