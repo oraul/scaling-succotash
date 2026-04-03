@@ -15,6 +15,17 @@ Write findings into contract Insights — the human reads them at the Assess gat
 This step has no output file of its own. It enriches the contract.
 It does not block the pipeline — it informs the human who does.
 
+## Architecture reference
+
+The codebase follows Clean Architecture with deep modules:
+
+- **Routes** (`lib/routes/`) — HTTP boundary. One use case call per route. No business logic.
+- **Use Cases** (`lib/use_cases/`) — all business logic. Single `.call` entry point, complexity inside `#execute`.
+- **Models** (`lib/models/`) — data integrity only. Sequel validations. No business rules.
+- Dependencies flow inward: routes → use cases → models. Never the reverse.
+
+Judge evaluates the contract against this architecture before any code is written.
+
 ## Judgment
 
 You are the design reviewer. Your job is to find what Compile and Plan missed.

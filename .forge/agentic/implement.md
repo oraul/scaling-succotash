@@ -10,8 +10,9 @@
 
 ## Purpose
 
-Read the approved contract and tasks. Make every Draft spec pass.
-The contract was reviewed by Judge and approved by a human — trust it.
+Read the approved contract and tasks. Make every Draft spec pass following the
+architecture defined below. The contract was reviewed by Judge and approved by
+a human — trust the design decisions, apply them correctly.
 Order: read → migrate → models → use cases → routes → self-review.
 
 ## Ruby layers
